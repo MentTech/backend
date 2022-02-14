@@ -18,6 +18,13 @@ API server for mentoring system.
 $ yarn install
 ```
 
+## Environment variable
+
+```
+DATABASE_URL="postgresql://<username>:<password>@<address>:<port>/<database>?schema=<schema_name>"
+JWT_SECRET=<jwt_secret_string>
+```
+
 ## Running the app
 
 ```bash
