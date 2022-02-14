@@ -1,14 +1,19 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '../users/users.service';
 import { JwtPayload } from './dtos/jwt-payload.dto';
 
+@Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly userService: UsersService) {
+  constructor(
+    private readonly userService: UsersService,
+    private readonly config: ConfigService,
+  ) {
     super({
-      secretOrKey: 'lascnkasc',
+      secretOrKey: config.get<string>('JWT_SECRET'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }
