@@ -28,6 +28,9 @@ JWT_SECRET=<jwt_secret_string>
 ## Running the app
 
 ```bash
+# apply migrations to database
+$ yarn prisma migrate deploy
+  
 # development
 $ yarn start
 
