@@ -3,6 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 import { ResponseDto } from '../../dtos/response.dto';
 import { UserDto } from '../../dtos/user.dto';
+import { Serialize } from '../../interceptors/serialize.interceptor';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { AuthService } from './auth.service';
 import { CredentialDto } from './dtos/credential.dto';
@@ -12,6 +13,7 @@ import { CredentialDto } from './dtos/credential.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Serialize(UserDto)
   @Post('signup')
   @ApiOperation({ summary: 'Sign up' })
   @ApiResponse({
@@ -22,17 +24,8 @@ export class AuthController {
     status: 400,
     description: 'Bad request',
   })
-  async signUp(@Body() credentialDto: CreateUserDto) {
-    const user = plainToClass(
-      UserDto,
-      await this.authService.signUp(credentialDto),
-    );
-    const userRes: ResponseDto = {
-      success: true,
-      message: 'Sign up success',
-      data: user,
-    };
-    return userRes;
+  signUp(@Body() credentialDto: CreateUserDto) {
+    return this.authService.signUp(credentialDto);
   }
 
   @Post('signin')
@@ -49,11 +42,7 @@ export class AuthController {
     status: 401,
     description: 'Wrong password or user does not exist',
   })
-  async signIn(@Body() credentialDto: CredentialDto) {
-    return {
-      success: true,
-      message: 'log in success',
-      data: await this.authService.signIn(credentialDto),
-    };
+  signIn(@Body() credentialDto: CredentialDto) {
+    return this.authService.signIn(credentialDto);
   }
 }
