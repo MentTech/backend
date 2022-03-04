@@ -1,5 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { SerializeInterceptor } from '../interceptors/serialize.interceptor';
@@ -24,6 +25,8 @@ const setup = (app: INestApplication) => {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   setup(app);
-  await app.listen(3000);
+  const config = app.get(ConfigService);
+  const port = config.get<string>('port');
+  await app.listen(port);
 }
 bootstrap();
