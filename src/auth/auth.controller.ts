@@ -1,7 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { plainToClass } from 'class-transformer';
-import { ResponseDto } from '../../dtos/response.dto';
 import { UserDto } from '../../dtos/user.dto';
 import { Serialize } from '../../interceptors/serialize.interceptor';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
@@ -44,5 +51,20 @@ export class AuthController {
   })
   signIn(@Body() credentialDto: CredentialDto) {
     return this.authService.signIn(credentialDto);
+  }
+
+  @Get('/google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {}
+
+  @Get('/google/redirect')
+  @UseGuards(AuthGuard('google'))
+  googleAuthRedirect(@Req() req) {
+    return this.authService.googleLogin(req);
+  }
+
+  @Get('/google/token')
+  googleTokenLogin(@Query('token') token: string) {
+    return this.authService.googleTokenLogin(token);
   }
 }
