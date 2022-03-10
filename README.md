@@ -30,7 +30,10 @@ JWT_SECRET=<jwt_secret_string>
 ```bash
 # apply migrations to database
 $ yarn prisma migrate deploy
-  
+
+# start prisma studio server
+$ yarn prisma studio
+
 # development
 $ yarn start
 
@@ -40,6 +43,10 @@ $ yarn start:dev
 # production mode
 $ yarn start:prod
 ```
+
+## API documentation
+
+/v1/docs
 
 ## Test
 
