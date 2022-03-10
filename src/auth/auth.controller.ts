@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserDto } from '../../dtos/user.dto';
-import { Serialize } from '../../interceptors/serialize.interceptor';
+import { UserDto } from '../dtos/user.dto';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { AuthService } from './auth.service';
 import { CredentialDto } from './dtos/credential.dto';

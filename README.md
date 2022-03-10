@@ -23,6 +23,7 @@ $ yarn install
 ```
 DATABASE_URL="postgresql://<username>:<password>@<address>:<port>/<database>?schema=<schema_name>"
 JWT_SECRET=<jwt_secret_string>
+PORT=8080
 ```
 
 ## Running the app

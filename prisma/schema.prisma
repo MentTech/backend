@@ -11,15 +11,65 @@ datasource db {
 }
 
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
-  password  String
-  name      String?
-  role      Role    @default(USER)
+  id          Int         @id @default(autoincrement())
+  email       String      @unique
+  password    String
+  name        String?
+  role        Role        @default(MENTEE)
+  birthday    DateTime?
+  phone       String?
+  avatar      String?
+  isActive    Boolean     @default(true)
+  coin        Int         @default(0)
+  User_mentor UserMentor?
+}
+
+model UserMentor {
+  userId       Int           @id
+  User         User          @relation(fields: [userId], references: [id])
+  degree       String[]
+  experiences  String[]
+  linkedin     String?
+  jobs         Job[]
+  achievements Achievement[]
+  skills       Skill[]
+  field        String
+  skill        Json
+  detail       String
+  rating       Decimal       @default(0)
+}
+
+model Job {
+  id         Int        @id @default(autoincrement())
+  startDate  DateTime?
+  endDate    DateTime?
+  company    String
+  position   String
+  additional Json?
+  mentor     UserMentor @relation(fields: [mentorId], references: [userId])
+  mentorId   Int
+}
+
+model Achievement {
+  id          Int        @id @default(autoincrement())
+  mentorId    Int
+  mentor      UserMentor @relation(fields: [mentorId], references: [userId])
+  description String
+  additional  Json?
+}
+
+model Skill {
+  id          Int        @id @default(autoincrement())
+  mentorId    Int
+  mentor      UserMentor @relation(fields: [mentorId], references: [userId])
+  description String
+  additional  Json?
 }
 
 enum Role {
   ADMIN
   USER
   MODERATOR
+  MENTEE
+  MENTOR
 }
