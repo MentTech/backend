@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '@prisma/client';
 import axios from 'axios';
 import { compare, genSalt, hash } from 'bcrypt';
 import { randomBytes } from 'crypto';
@@ -18,6 +19,10 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
+  async createHashedPassword(password: string) {
+    const salt = await genSalt();
+    return hash(password, salt);
+  }
 
   async signUp(credentials: CreateUserDto) {
     const { password } = credentials;
@@ -37,10 +42,14 @@ export class AuthService {
     }
   }
 
-  async signIn(credential: CredentialDto) {
+  async signIn(credential: CredentialDto, role: Role) {
     const { email, password } = credential;
     const user = await this.usersService.findByEmail(email);
-    if (user && (await compare(password, user.password))) {
+    if (
+      user &&
+      (await compare(password, user.password)) &&
+      user.role === role
+    ) {
       const payload: JwtPayload = { id: user.id };
       const accessToken = this.jwtService.sign(payload);
       return { accessToken };

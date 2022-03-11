@@ -1,6 +1,12 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from '../decorators/get-user.decorator';
 import { UserDto } from '../dtos/user.dto';
@@ -20,6 +26,10 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'get profile success',
+  })
+  @ApiHeader({
+    name: 'Bearer',
+    description: 'Authentication',
   })
   getProfile(@GetUser() user: User) {
     return user;

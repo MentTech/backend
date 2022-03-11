@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { UserDto } from '../dtos/user.dto';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
@@ -36,7 +37,7 @@ export class AuthController {
   }
 
   @Post('signin')
-  @ApiOperation({ summary: 'Sign in' })
+  @ApiOperation({ summary: 'Mentee sign in' })
   @ApiResponse({
     status: 201,
     description: 'Log in success, return access token',
@@ -50,7 +51,7 @@ export class AuthController {
     description: 'Wrong password or user does not exist',
   })
   signIn(@Body() credentialDto: CredentialDto) {
-    return this.authService.signIn(credentialDto);
+    return this.authService.signIn(credentialDto, Role.MENTEE);
   }
 
   @Get('/google')

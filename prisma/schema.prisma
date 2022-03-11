@@ -22,6 +22,7 @@ model User {
   isActive    Boolean     @default(true)
   coin        Int         @default(0)
   User_mentor UserMentor?
+  createAt     DateTime      @default(now())
 }
 
 model UserMentor {
@@ -34,9 +35,10 @@ model UserMentor {
   achievements Achievement[]
   skills       Skill[]
   field        String
-  skill        Json
-  detail       String
+  introduction String
   rating       Decimal       @default(0)
+  isAccepted   Boolean       @default(false)
+  createAt     DateTime      @default(now())
 }
 
 model Job {
