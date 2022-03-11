@@ -7,9 +7,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import authConfig from '../config/auth.config';
 import commonConfig from '../config/common.config';
-import {APP_GUARD} from "@nestjs/core";
-import {RolesGuard} from "./guards/roles.guard";
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './guards/roles.guard';
 import { MentorModule } from './mentor/mentor.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -21,11 +22,9 @@ import { MentorModule } from './mentor/mentor.module';
       load: [authConfig, commonConfig],
     }),
     MentorModule,
+    AdminModule,
   ],
   controllers: [AppController],
-  providers: [AppService, {
-    provide: APP_GUARD,
-    useClass: RolesGuard,
-  }],
+  providers: [AppService],
 })
 export class AppModule {}

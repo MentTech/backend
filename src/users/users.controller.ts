@@ -8,6 +8,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import JwtAuthenticationGuard from '../auth/guards/jwt-authentiacation.guard';
 import { GetUser } from '../decorators/get-user.decorator';
 import { UserDto } from '../dtos/user.dto';
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -20,7 +21,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Serialize(UserDto)
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAuthenticationGuard)
   @Get('/profile')
   @ApiOperation({ summary: 'Get user profile' })
   @ApiResponse({
@@ -36,7 +37,7 @@ export class UsersController {
   }
 
   @Patch('/profile')
-  @UseGuards(AuthGuard())
+  @UseGuards(JwtAuthenticationGuard)
   @Serialize(UserDto)
   @ApiOperation({ summary: 'Change user profile' })
   @ApiResponse({

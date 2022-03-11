@@ -35,7 +35,7 @@ export class AuthService {
       name: credentials.name,
     };
     try {
-      const user = await this.usersService.createUser(newUser);
+      const user = await this.usersService.createUser(newUser, Role.MENTEE);
       return user;
     } catch (err) {
       throw new ConflictException('email already exists');
@@ -48,7 +48,8 @@ export class AuthService {
     if (
       user &&
       (await compare(password, user.password)) &&
-      user.role === role
+      user.role === role &&
+      user.isActive
     ) {
       const payload: JwtPayload = { id: user.id };
       const accessToken = this.jwtService.sign(payload);

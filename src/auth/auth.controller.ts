@@ -68,4 +68,10 @@ export class AuthController {
   googleTokenLogin(@Query('token') token: string) {
     return this.authService.googleTokenLogin(token);
   }
+
+  @Post('/signIn/admin')
+  @ApiOperation({ summary: 'Admin sign in' })
+  adminSignIn(@Body() credential: CredentialDto) {
+    return this.authService.signIn(credential, Role.ADMIN);
+  }
 }

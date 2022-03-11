@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -7,12 +8,18 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  createUser(user: CreateUserDto) {
-    return this.prisma.user.create({
-      data: {
-        ...user,
-      },
-    });
+  async createUser(user: CreateUserDto, role: Role) {
+    try {
+      const newUser = await this.prisma.user.create({
+        data: {
+          ...user,
+          role,
+        },
+      });
+      return newUser;
+    } catch (err) {
+      throw new BadRequestException('Email is already exist');
+    }
   }
 
   findById(id: number) {

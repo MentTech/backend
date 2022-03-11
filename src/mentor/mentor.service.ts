@@ -25,6 +25,7 @@ export class MentorService {
         phone: form.phone,
         avatar: form.avatar,
         role: Role.MENTOR,
+        isActive: false,
         User_mentor: {
           create: {
             degree: form.degree,
