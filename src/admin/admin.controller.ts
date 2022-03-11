@@ -1,7 +1,9 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
@@ -20,6 +22,7 @@ import { AdminService } from './admin.service';
 @ApiForbiddenResponse({
   description: 'Forbidden',
 })
+@ApiBearerAuth()
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
@@ -28,6 +31,7 @@ export class AdminController {
   @ApiCreatedResponse({
     description: 'New admin created',
   })
+  @ApiOperation({ summary: 'add new admin' })
   addAdmin(@Body() admin: CreateUserDto) {
     return this.adminService.addAdmin(admin);
   }

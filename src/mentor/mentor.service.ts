@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
+import * as _ from 'lodash';
 
 @Injectable()
 export class MentorService {
@@ -53,5 +54,55 @@ export class MentorService {
       },
     });
     return 'Form submitted';
+  }
+
+  async getMentors(pending: boolean) {
+    const users = await this.prisma.user.findMany({
+      where: {
+        AND: {
+          role: Role.MENTOR,
+          isActive: pending ? false : undefined,
+          User_mentor: {
+            isAccepted: pending ? false : undefined,
+          },
+        },
+      },
+      include: {
+        User_mentor: {
+          include: {
+            jobs: true,
+            achievements: true,
+            skills: true,
+          },
+        },
+      },
+    });
+    return users.map((user) => _.omit(user, 'password'));
+  }
+
+  async acceptMentor(id: number) {
+    const mentor = await this.prisma.user.findFirst({
+      where: {
+        id,
+        role: Role.MENTOR,
+        isActive: false,
+        User_mentor: { isAccepted: false },
+      },
+      include: { User_mentor: true },
+    });
+    if (!mentor) {
+      throw new NotFoundException('Application not found');
+    }
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        isActive: true,
+        User_mentor: {
+          update: {
+            isAccepted: true,
+          },
+        },
+      },
+    });
   }
 }

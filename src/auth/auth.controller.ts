@@ -65,6 +65,7 @@ export class AuthController {
   }
 
   @Get('/google/token')
+  @ApiOperation({ summary: 'log in with google token' })
   googleTokenLogin(@Query('token') token: string) {
     return this.authService.googleTokenLogin(token);
   }

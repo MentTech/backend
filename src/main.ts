@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as basicAuth from 'express-basic-auth';
 
 const setup = (app: INestApplication) => {
   app.enableVersioning({
@@ -19,10 +20,20 @@ const setup = (app: INestApplication) => {
       whitelist: true,
     }),
   );
+  app.use(
+    ['/v1/docs'],
+    basicAuth({
+      challenge: true,
+      users: {
+        admin: 'password',
+      },
+    }),
+  );
   const config = new DocumentBuilder()
     .setTitle('Jett')
     .setDescription('The Jett API description')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('v1/docs', app, document);
