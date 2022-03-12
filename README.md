@@ -23,6 +23,7 @@ $ yarn install
 ```
 DATABASE_URL="postgresql://<username>:<password>@<address>:<port>/<database>?schema=<schema_name>"
 JWT_SECRET=<jwt_secret_string>
+PORT=8080
 ```
 
 ## Running the app
@@ -30,7 +31,10 @@ JWT_SECRET=<jwt_secret_string>
 ```bash
 # apply migrations to database
 $ yarn prisma migrate deploy
-  
+
+# start prisma studio server
+$ yarn prisma studio
+
 # development
 $ yarn start
 
@@ -40,6 +44,10 @@ $ yarn start:dev
 # production mode
 $ yarn start:prod
 ```
+
+## API documentation
+
+/v1/docs
 
 ## Test
 

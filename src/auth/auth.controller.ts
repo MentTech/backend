@@ -9,8 +9,9 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UserDto } from '../../dtos/user.dto';
-import { Serialize } from '../../interceptors/serialize.interceptor';
+import { Role } from '@prisma/client';
+import { UserDto } from '../dtos/user.dto';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { AuthService } from './auth.service';
 import { CredentialDto } from './dtos/credential.dto';
@@ -36,7 +37,7 @@ export class AuthController {
   }
 
   @Post('signin')
-  @ApiOperation({ summary: 'Sign in' })
+  @ApiOperation({ summary: 'Mentee sign in' })
   @ApiResponse({
     status: 201,
     description: 'Log in success, return access token',
@@ -50,7 +51,7 @@ export class AuthController {
     description: 'Wrong password or user does not exist',
   })
   signIn(@Body() credentialDto: CredentialDto) {
-    return this.authService.signIn(credentialDto);
+    return this.authService.signIn(credentialDto, Role.MENTEE);
   }
 
   @Get('/google')
@@ -64,7 +65,14 @@ export class AuthController {
   }
 
   @Get('/google/token')
+  @ApiOperation({ summary: 'log in with google token' })
   googleTokenLogin(@Query('token') token: string) {
     return this.authService.googleTokenLogin(token);
+  }
+
+  @Post('/signIn/admin')
+  @ApiOperation({ summary: 'Admin sign in' })
+  adminSignIn(@Body() credential: CredentialDto) {
+    return this.authService.signIn(credential, Role.ADMIN);
   }
 }

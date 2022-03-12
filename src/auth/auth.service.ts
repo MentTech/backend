@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '@prisma/client';
 import axios from 'axios';
 import { compare, genSalt, hash } from 'bcrypt';
 import { randomBytes } from 'crypto';
@@ -18,6 +19,10 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
+  async createHashedPassword(password: string) {
+    const salt = await genSalt();
+    return hash(password, salt);
+  }
 
   async signUp(credentials: CreateUserDto) {
     const { password } = credentials;
@@ -30,17 +35,22 @@ export class AuthService {
       name: credentials.name,
     };
     try {
-      const user = await this.usersService.createUser(newUser);
+      const user = await this.usersService.createUser(newUser, Role.MENTEE);
       return user;
     } catch (err) {
       throw new ConflictException('email already exists');
     }
   }
 
-  async signIn(credential: CredentialDto) {
+  async signIn(credential: CredentialDto, role: Role) {
     const { email, password } = credential;
     const user = await this.usersService.findByEmail(email);
-    if (user && (await compare(password, user.password))) {
+    if (
+      user &&
+      (await compare(password, user.password)) &&
+      user.role === role &&
+      user.isActive
+    ) {
       const payload: JwtPayload = { id: user.id };
       const accessToken = this.jwtService.sign(payload);
       return { accessToken };
