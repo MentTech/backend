@@ -16,6 +16,9 @@ API server for mentoring system.
 
 ```bash
 $ yarn install
+  
+# every time pull new code run
+$ yarn prisma generate
 ```
 
 ## Environment variable
