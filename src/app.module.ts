@@ -11,6 +11,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './guards/roles.guard';
 import { MentorModule } from './mentor/mentor.module';
 import { AdminModule } from './admin/admin.module';
+import { SkillModule } from './skill/skill.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AdminModule } from './admin/admin.module';
     }),
     MentorModule,
     AdminModule,
+    SkillModule,
   ],
   controllers: [AppController],
   providers: [AppService],

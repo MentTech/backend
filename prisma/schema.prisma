@@ -22,23 +22,31 @@ model User {
   isActive    Boolean     @default(true)
   coin        Int         @default(0)
   User_mentor UserMentor?
-  createAt     DateTime      @default(now())
+  createAt    DateTime    @default(now())
 }
 
 model UserMentor {
-  userId       Int           @id
-  User         User          @relation(fields: [userId], references: [id])
+  userId       Int               @id
+  User         User              @relation(fields: [userId], references: [id])
   degree       String[]
   experiences  String[]
   linkedin     String?
   jobs         Job[]
   achievements Achievement[]
-  skills       Skill[]
-  field        String
+  skills       SkillsOnMentors[]
+  categoryId   Int
+  category     Category          @relation(fields: [categoryId], references: [id])
   introduction String
-  rating       Decimal       @default(0)
-  isAccepted   Boolean       @default(false)
-  createAt     DateTime      @default(now())
+  rating       Decimal           @default(0)
+  isAccepted   Boolean           @default(false)
+  createAt     DateTime          @default(now())
+}
+
+model Category {
+  id       Int          @id @default(autoincrement())
+  name     String       @unique
+  createAt DateTime     @default(now())
+  mentors  UserMentor[]
 }
 
 model Job {
@@ -61,11 +69,20 @@ model Achievement {
 }
 
 model Skill {
-  id          Int        @id @default(autoincrement())
-  mentorId    Int
-  mentor      UserMentor @relation(fields: [mentorId], references: [userId])
+  id          Int               @id @default(autoincrement())
   description String
   additional  Json?
+  mentors     SkillsOnMentors[]
+}
+
+model SkillsOnMentors {
+  mentorId Int
+  mentor   UserMentor @relation(fields: [mentorId], references: [userId])
+  skillId  Int
+  skill    Skill      @relation(fields: [skillId], references: [id])
+  createAt DateTime   @default(now())
+
+  @@id([mentorId, skillId])
 }
 
 enum Role {

@@ -4,6 +4,7 @@ import {
   IsArray,
   IsDateString,
   IsEmail,
+  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -78,17 +79,17 @@ export class SubmitMentorDto {
   })
   achievements: string[];
 
-  @IsString({ each: true })
+  @IsNumber({}, { each: true })
   @ApiProperty({
-    example: ['1', '2'],
+    example: [1, 2],
   })
-  skills: string[];
+  skillIds: number[];
 
-  @IsString()
+  @IsNumber()
   @ApiProperty({
-    example: 'BE',
+    example: 1,
   })
-  field: string;
+  categoryId: number;
 
   @IsString()
   @ApiProperty({

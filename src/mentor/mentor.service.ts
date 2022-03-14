@@ -31,16 +31,18 @@ export class MentorService {
           create: {
             degree: form.degree,
             experiences: form.experiences,
-            field: form.field,
-            skills: {
-              createMany: {
-                data: form.skills.map((s) => ({ description: s })),
-              },
+            category: {
+              connect: { id: form.categoryId },
             },
             jobs: {
               createMany: {
                 data: form.jobs,
               },
+            },
+            skills: {
+              create: form.skillIds.map((skillId) => ({
+                skill: { connect: { id: skillId } },
+              })),
             },
             achievements: {
               createMany: {
