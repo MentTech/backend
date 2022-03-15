@@ -73,6 +73,7 @@ model Skill {
   description String
   additional  Json?
   mentors     SkillsOnMentors[]
+  createdAt   DateTime          @default(now())
 }
 
 model SkillsOnMentors {
@@ -80,7 +81,7 @@ model SkillsOnMentors {
   mentor   UserMentor @relation(fields: [mentorId], references: [userId])
   skillId  Int
   skill    Skill      @relation(fields: [skillId], references: [id])
-  createAt DateTime   @default(now())
+  createdAt DateTime   @default(now())
 
   @@id([mentorId, skillId])
 }
