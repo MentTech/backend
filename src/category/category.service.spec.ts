@@ -3,14 +3,48 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { PrismaService } from '../prisma/prisma.service';
 import { CategoryService } from './category.service';
 
+const categoryArray = [
+  {
+    id: 1,
+    name: 'test',
+    createAt: new Date(),
+  },
+  {
+    id: 2,
+    name: 'test2',
+    createAt: new Date(),
+  },
+];
+
+const oneCategory = {
+  id: 1,
+  name: 'test',
+  createAt: new Date(),
+};
+
+const db = {
+  category: {
+    findMany: jest.fn().mockResolvedValue(categoryArray),
+    findUnique: jest.fn().mockResolvedValue(oneCategory),
+    create: jest.fn().mockResolvedValue(oneCategory),
+    update: jest.fn().mockResolvedValue(oneCategory),
+    delete: jest.fn().mockResolvedValue(oneCategory),
+  },
+};
+
 describe('CategoryService', () => {
   let service: CategoryService;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PrismaModule],
-      providers: [CategoryService],
+      providers: [
+        CategoryService,
+        {
+          provide: PrismaService,
+          useValue: db,
+        },
+      ],
     }).compile();
 
     service = module.get<CategoryService>(CategoryService);
@@ -18,11 +52,6 @@ describe('CategoryService', () => {
   });
 
   it('should create new category', async () => {
-    prisma.category.create = jest.fn().mockResolvedValue({
-      id: 1,
-      name: 'test',
-      createAt: new Date(),
-    });
     const category = await service.create({
       name: 'test',
     });
@@ -31,38 +60,16 @@ describe('CategoryService', () => {
   });
 
   it('should return all category in db', async () => {
-    prisma.category.findMany = jest.fn().mockResolvedValue([
-      {
-        id: 1,
-        name: 'test',
-        createAt: new Date(),
-      },
-      {
-        id: 2,
-        name: 'test2',
-        createAt: new Date(),
-      },
-    ]);
     const categories = await service.findAll();
     expect(categories.length).toEqual(2);
   });
 
   it('should return category with matching id', async () => {
-    prisma.category.findUnique = jest.fn().mockResolvedValue({
-      id: 1,
-      name: 'test',
-      createAt: new Date(),
-    });
     const category = await service.findOne(1);
     expect(category.id).toEqual(1);
   });
 
   it('update category with new name', async () => {
-    prisma.category.update = jest.fn().mockResolvedValue({
-      id: 1,
-      name: 'test',
-      createAt: new Date(),
-    });
     const category = await service.update(1, {
       name: 'test',
     });
@@ -70,11 +77,6 @@ describe('CategoryService', () => {
   });
 
   it('should delete category with matching id', async () => {
-    prisma.category.delete = jest.fn().mockResolvedValue({
-      id: 1,
-      name: 'test',
-      createAt: new Date(),
-    });
     const category = await service.remove(1);
     expect(category.id).toEqual(1);
   });
