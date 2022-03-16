@@ -4,10 +4,11 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as basicAuth from 'express-basic-auth';
+import { PrismaClientExceptionFilter } from './filters/prisma-client-exception.filter';
 
 const setup = (app: INestApplication) => {
   app.enableVersioning({
@@ -20,6 +21,8 @@ const setup = (app: INestApplication) => {
       whitelist: true,
     }),
   );
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
   app.use(
     ['/v1/docs'],
     basicAuth({
