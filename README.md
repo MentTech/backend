@@ -16,9 +16,6 @@ API server for mentoring system.
 
 ```bash
 $ yarn install
-  
-# every time pull new code run
-$ yarn prisma generate
 ```
 
 ## Environment variable
@@ -34,6 +31,9 @@ PORT=8080
 ```bash
 # apply migrations to database
 $ yarn prisma migrate deploy
+  
+# every time pull new code run
+$ yarn prisma generate
 
 # start prisma studio server
 $ yarn prisma studio
