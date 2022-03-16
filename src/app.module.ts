@@ -12,6 +12,7 @@ import { RolesGuard } from './guards/roles.guard';
 import { MentorModule } from './mentor/mentor.module';
 import { AdminModule } from './admin/admin.module';
 import { SkillModule } from './skill/skill.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SkillModule } from './skill/skill.module';
     MentorModule,
     AdminModule,
     SkillModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
