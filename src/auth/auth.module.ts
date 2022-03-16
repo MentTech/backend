@@ -7,9 +7,12 @@ import { UsersModule } from '../users/users.module';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 import { GoogleStrategy } from './google.strategy';
+import { BcryptService } from './bcrypt.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    HttpModule,
     forwardRef(() => UsersModule),
     PassportModule.register({
       defaultStrategy: 'jwt',
@@ -26,7 +29,7 @@ import { GoogleStrategy } from './google.strategy';
       },
     }),
   ],
-  providers: [AuthService, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, JwtStrategy, GoogleStrategy, BcryptService],
   controllers: [AuthController],
   exports: [JwtStrategy, PassportModule, AuthService],
 })

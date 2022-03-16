@@ -1,3 +1,4 @@
+import { HttpService } from '@nestjs/axios';
 import {
   ConflictException,
   Injectable,
@@ -6,10 +7,11 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import axios from 'axios';
-import { compare, genSalt, hash } from 'bcrypt';
 import { randomBytes } from 'crypto';
+import { firstValueFrom } from 'rxjs';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { UsersService } from '../users/users.service';
+import { BcryptService } from './bcrypt.service';
 import { CredentialDto } from './dtos/credential.dto';
 import { JwtPayload } from './dtos/jwt-payload.dto';
 
@@ -18,17 +20,17 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly bcryptService: BcryptService,
+    private readonly httpService: HttpService,
   ) {}
   async createHashedPassword(password: string) {
-    const salt = await genSalt();
-    return hash(password, salt);
+    return this.bcryptService.hash(password);
   }
 
   async signUp(credentials: CreateUserDto) {
     const { password } = credentials;
 
-    const salt = await genSalt();
-    const hashedPassword = await hash(password, salt);
+    const hashedPassword = await this.createHashedPassword(password);
     const newUser: CreateUserDto = {
       email: credentials.email,
       password: hashedPassword,
@@ -47,7 +49,7 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
     if (
       user &&
-      (await compare(password, user.password)) &&
+      (await this.bcryptService.compare(password, user.password)) &&
       user.role === role &&
       user.isActive
     ) {
@@ -70,8 +72,10 @@ export class AuthService {
 
   async googleTokenLogin(accessToken: string) {
     try {
-      const { data } = await axios.get(
-        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
+      const { data } = await firstValueFrom(
+        this.httpService.get(
+          `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
+        ),
       );
       return this.logInByEmail(data.email, data.name);
     } catch (e) {
