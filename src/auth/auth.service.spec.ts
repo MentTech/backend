@@ -3,7 +3,7 @@ import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Role } from '@prisma/client';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { BcryptService } from './bcrypt.service';
@@ -21,6 +21,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let usersService: UsersService;
   let bcryptService: BcryptService;
+  let httpService: HttpService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -62,6 +63,7 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     usersService = module.get<UsersService>(UsersService);
     bcryptService = module.get<BcryptService>(BcryptService);
+    httpService = module.get<HttpService>(HttpService);
   });
 
   it('should be defined', () => {
@@ -148,7 +150,23 @@ describe('AuthService', () => {
       expect(req.accessToken).toEqual('token');
     });
 
-    it('should sign in if user log in by user', async () => {
+    it('should create new account if email is not exist', async () => {
+      jest.spyOn(service, 'signUp').mockResolvedValue({
+        ...user,
+        password: 'hashedPassword',
+        birthday: new Date(),
+        phone: '+380937777777',
+        avatar: '',
+        coin: 0,
+        createAt: new Date(),
+      });
+      usersService.findByEmail = jest.fn().mockResolvedValue(null);
+      const req = await service.logInByEmail(user.email, user.name);
+      expect(req.accessToken).toEqual('token');
+      expect(usersService.findByEmail).toHaveBeenCalledWith(user.email);
+    });
+
+    it('should sign in if user log in by google', async () => {
       const token = 'token';
       const spy10 = jest.spyOn(service, 'logInByEmail').mockImplementation(() =>
         Promise.resolve({
@@ -159,5 +177,27 @@ describe('AuthService', () => {
       expect(data.accessToken).toEqual('token');
       expect(service.logInByEmail).toBeCalledWith(user.email, user.name);
     });
+
+    it('should throw error if google token is invalid', async () => {
+      const spy11 = jest
+        .spyOn(httpService, 'get')
+        .mockReturnValue(throwError(new Error('invalid token')));
+      await expect(service.googleTokenLogin('token')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+  });
+
+  it('should return user if user is auth', () => {
+    const req = { user };
+    const u = service.googleLogin(req);
+    const uR = u as { user: any };
+    expect(uR.user).toEqual(user);
+  });
+
+  it('should return "No user" if user is unauth', () => {
+    const req = {};
+    const u = service.googleLogin(req);
+    expect(u).toEqual('No user');
   });
 });

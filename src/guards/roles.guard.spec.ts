@@ -50,4 +50,10 @@ describe('RolesGuard', () => {
     expect(guard.canActivate(context)).toBe(false);
     expect(context.switchToHttp().getRequest).toHaveBeenCalled();
   });
+
+  it('should return true if roles if not provided', () => {
+    const context = createMock<ExecutionContext>();
+    mockReflector.getAllAndOverride = jest.fn().mockReturnValue(undefined);
+    expect(guard.canActivate(context)).toBe(true);
+  });
 });
