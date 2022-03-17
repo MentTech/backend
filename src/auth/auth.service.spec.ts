@@ -3,6 +3,7 @@ import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Role } from '@prisma/client';
+import { Observable, of } from 'rxjs';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { BcryptService } from './bcrypt.service';
@@ -47,7 +48,13 @@ describe('AuthService', () => {
         },
         {
           provide: HttpService,
-          useValue: {},
+          useValue: {
+            get: jest
+              .fn()
+              .mockReturnValue(
+                of({ data: { email: user.email, name: user.name } }),
+              ),
+          },
         },
       ],
     }).compile();
@@ -139,6 +146,18 @@ describe('AuthService', () => {
       const email = 'test@email.com';
       const req = await service.logInByEmail(email, 'John');
       expect(req.accessToken).toEqual('token');
+    });
+
+    it('should sign in if user log in by user', async () => {
+      const token = 'token';
+      const spy10 = jest.spyOn(service, 'logInByEmail').mockImplementation(() =>
+        Promise.resolve({
+          accessToken: token,
+        }),
+      );
+      const data = await service.googleTokenLogin(token);
+      expect(data.accessToken).toEqual('token');
+      expect(service.logInByEmail).toBeCalledWith(user.email, user.name);
     });
   });
 });

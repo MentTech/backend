@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
-import axios from 'axios';
 import { randomBytes } from 'crypto';
 import { firstValueFrom } from 'rxjs';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
@@ -79,7 +78,7 @@ export class AuthService {
       );
       return this.logInByEmail(data.email, data.name);
     } catch (e) {
-      return new UnauthorizedException('Please check your login credential');
+      throw new UnauthorizedException('Please check your login credential');
     }
   }
 

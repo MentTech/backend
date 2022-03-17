@@ -488,6 +488,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@golevelup/ts-jest@npm:^0.3.2":
+  version: 0.3.2
+  resolution: "@golevelup/ts-jest@npm:0.3.2"
+  checksum: c36dbbf82cba929551d23bc23ca161ce7e742e204476c65ccb713c2d948217459833d1f42522ed46604e5fafd984d3b433a36a8902218d32fd20d69dc51776a6
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.9.2":
   version: 0.9.5
   resolution: "@humanwhocodes/config-array@npm:0.9.5"
@@ -4934,6 +4941,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "jett-backend@workspace:."
   dependencies:
+    "@golevelup/ts-jest": ^0.3.2
     "@nestjs/axios": ^0.0.7
     "@nestjs/cli": ^8.0.0
     "@nestjs/common": ^8.0.0
