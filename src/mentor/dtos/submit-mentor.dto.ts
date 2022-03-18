@@ -1,7 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsArray,
   IsDateString,
   IsEmail,
   IsNumber,
@@ -9,7 +8,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { CreateDegreeDto } from './create-degree.dto';
+import { CreateDegreeDto } from '../degree/dto/create-degree.dto';
 import { CreateExperienceDto } from './create-experience.dto';
 import { JobDto } from './job.dtos';
 
