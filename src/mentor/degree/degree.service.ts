@@ -15,6 +15,9 @@ export class DegreeService {
           create: createDegreeDto,
         },
       },
+      select: {
+        degree: true,
+      },
     });
   }
 

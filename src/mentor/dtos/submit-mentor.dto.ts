@@ -9,7 +9,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { CreateDegreeDto } from '../degree/dto/create-degree.dto';
-import { CreateExperienceDto } from './create-experience.dto';
+import { CreateExperienceDto } from '../experience/dto/create-experience.dto';
 import { JobDto } from './job.dtos';
 
 export class SubmitMentorDto {

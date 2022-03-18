@@ -72,6 +72,9 @@ describe('DegreeService', () => {
           create: createDegreeDto,
         },
       },
+      select: {
+        degree: true,
+      },
     });
     expect(result).toEqual(mentor);
   });
