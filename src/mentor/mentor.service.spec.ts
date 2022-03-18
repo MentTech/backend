@@ -11,8 +11,22 @@ const form: SubmitMentorDto = {
   birthday: '2020-01-01',
   phone: '123456789',
   avatar: 'avatar',
-  degree: ['degree'],
-  experiences: ['experiences'],
+  degree: [
+    {
+      title: 'test',
+      issuer: 'test',
+      description: 'test',
+      startAt: '2020-01-01',
+    },
+  ],
+  experiences: [
+    {
+      title: 'test',
+      description: 'test',
+      company: 'test',
+      startAt: '2020-01-01',
+    },
+  ],
   categoryId: 1,
   jobs: [
     {

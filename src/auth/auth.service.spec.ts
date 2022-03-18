@@ -3,7 +3,7 @@ import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Role } from '@prisma/client';
-import { Observable, of, throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { BcryptService } from './bcrypt.service';

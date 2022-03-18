@@ -9,6 +9,8 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { CreateDegreeDto } from './create-degree.dto';
+import { CreateExperienceDto } from './create-experience.dto';
 import { JobDto } from './job.dtos';
 
 export class SubmitMentorDto {
@@ -43,21 +45,23 @@ export class SubmitMentorDto {
   })
   avatar: string;
 
-  @IsString({
+  @ValidateNested({
     each: true,
   })
+  @Type(() => CreateDegreeDto)
   @ApiProperty({
-    example: ['CS', 'SE'],
+    type: [CreateDegreeDto],
   })
-  degree: string[];
+  degree: CreateDegreeDto[];
 
-  @IsString({
+  @ValidateNested({
     each: true,
   })
+  @Type(() => CreateExperienceDto)
   @ApiProperty({
-    example: ['1', '2'],
+    type: [CreateExperienceDto],
   })
-  experiences: string[];
+  experiences: CreateExperienceDto[];
 
   @IsOptional()
   @IsString()
@@ -69,7 +73,7 @@ export class SubmitMentorDto {
   @ValidateNested({ each: true })
   @Type(() => JobDto)
   @ApiProperty({
-    type: JobDto,
+    type: [JobDto],
   })
   jobs: JobDto[];
 

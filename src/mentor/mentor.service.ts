@@ -29,8 +29,12 @@ export class MentorService {
         isActive: false,
         User_mentor: {
           create: {
-            degree: form.degree,
-            experiences: form.experiences,
+            degree: {
+              create: form.degree,
+            },
+            experiences: {
+              create: form.experiences,
+            },
             category: {
               connect: { id: form.categoryId },
             },

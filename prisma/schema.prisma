@@ -28,8 +28,8 @@ model User {
 model UserMentor {
   userId       Int               @id
   User         User              @relation(fields: [userId], references: [id])
-  degree       String[]
-  experiences  String[]
+  degree       Degree[]
+  experiences  Experience[]
   linkedin     String?
   jobs         Job[]
   achievements Achievement[]
@@ -40,6 +40,33 @@ model UserMentor {
   rating       Decimal           @default(0)
   isAccepted   Boolean           @default(false)
   createAt     DateTime          @default(now())
+}
+
+model Experience {
+  id          Int        @id @default(autoincrement())
+  mentorId    Int
+  mentor      UserMentor @relation(fields: [mentorId], references: [userId])
+  title       String
+  company     String
+  description String?
+  startAt     DateTime
+  endAt       DateTime?
+  createAt    DateTime   @default(now())
+}
+
+model Degree {
+  id          Int        @id @default(autoincrement())
+  mentorId    Int
+  mentor      UserMentor @relation(fields: [mentorId], references: [userId])
+  title       String
+  issuer      String
+  description String?
+  degreeId    String?
+  url         String?
+  startAt     DateTime
+  endAt       DateTime?
+  expiredAt   DateTime?
+  createAt    DateTime   @default(now())
 }
 
 model Category {
@@ -73,14 +100,15 @@ model Skill {
   description String
   additional  Json?
   mentors     SkillsOnMentors[]
+  isAccepted  Boolean           @default(false)
   createdAt   DateTime          @default(now())
 }
 
 model SkillsOnMentors {
-  mentorId Int
-  mentor   UserMentor @relation(fields: [mentorId], references: [userId])
-  skillId  Int
-  skill    Skill      @relation(fields: [skillId], references: [id])
+  mentorId  Int
+  mentor    UserMentor @relation(fields: [mentorId], references: [userId])
+  skillId   Int
+  skill     Skill      @relation(fields: [skillId], references: [id])
   createdAt DateTime   @default(now())
 
   @@id([mentorId, skillId])
