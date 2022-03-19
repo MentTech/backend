@@ -116,4 +116,9 @@ describe('UsersService', () => {
     });
     expect(user).toEqual(users[1]);
   });
+
+  it('should change user password', async () => {
+    const user = await service.changePassword(1, 'test1');
+    expect(user).toEqual(users[1]);
+  });
 });

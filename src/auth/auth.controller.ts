@@ -8,13 +8,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Role, User } from '@prisma/client';
+import { GetUser } from '../decorators/get-user.decorator';
 import { UserDto } from '../dtos/user.dto';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
 import { AuthService } from './auth.service';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 import { CredentialDto } from './dtos/credential.dto';
+import JwtAuthenticationGuard from './guards/jwt-authentiacation.guard';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -74,5 +82,17 @@ export class AuthController {
   @ApiOperation({ summary: 'Admin sign in' })
   adminSignIn(@Body() credential: CredentialDto) {
     return this.authService.signIn(credential, Role.ADMIN);
+  }
+
+  @Post('/changepassword')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Change password' })
+  @ApiBearerAuth()
+  changePassword(@Body() body: ChangePasswordDto, @GetUser() user: User) {
+    return this.authService.changePassword(
+      user.id,
+      body.oldPassword,
+      body.newPassword,
+    );
   }
 }

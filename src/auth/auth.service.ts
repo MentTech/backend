@@ -95,4 +95,23 @@ export class AuthService {
     const jwt = this.jwtService.sign(payload);
     return { accessToken: jwt };
   }
+
+  async changePassword(
+    userId: number,
+    oldPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.usersService.findById(userId);
+    if (
+      user &&
+      (await this.bcryptService.compare(oldPassword, user.password)) &&
+      user.isActive
+    ) {
+      const hashedPassword = await this.createHashedPassword(newPassword);
+      await this.usersService.changePassword(user.id, hashedPassword);
+      return 'Password changed successfully';
+    } else {
+      throw new UnauthorizedException('Please check your old password');
+    }
+  }
 }

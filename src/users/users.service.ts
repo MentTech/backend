@@ -42,6 +42,17 @@ export class UsersService {
     });
   }
 
+  changePassword(id: number, password: string) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        password,
+      },
+    });
+  }
+
   changeProfile(id: number, user: UpdateUserDto) {
     return this.prisma.user.update({
       where: {

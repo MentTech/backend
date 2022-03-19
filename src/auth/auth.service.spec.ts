@@ -32,6 +32,8 @@ describe('AuthService', () => {
           useValue: {
             createUser: jest.fn().mockResolvedValue(user),
             findByEmail: jest.fn().mockResolvedValue(user),
+            changePassword: jest.fn().mockResolvedValue(user),
+            findById: jest.fn().mockResolvedValue(user),
           },
         },
         {
@@ -181,7 +183,7 @@ describe('AuthService', () => {
     it('should throw error if google token is invalid', async () => {
       const spy11 = jest
         .spyOn(httpService, 'get')
-        .mockReturnValue(throwError(new Error('invalid token')));
+        .mockReturnValue(throwError(() => new Error('invalid token')));
       await expect(service.googleTokenLogin('token')).rejects.toThrow(
         UnauthorizedException,
       );
@@ -199,5 +201,21 @@ describe('AuthService', () => {
     const req = {};
     const u = service.googleLogin(req);
     expect(u).toEqual('No user');
+  });
+
+  it('should change user password', async () => {
+    const spy = jest
+      .spyOn(bcryptService, 'hash')
+      .mockResolvedValue('hashedPassword');
+    const u = await service.changePassword(user.id, 'password', 'newPassword');
+    expect(u).toEqual('Password changed successfully');
+    expect(spy).toHaveBeenCalledWith('newPassword');
+  });
+
+  it('should throw error if old password is wrong', async () => {
+    const spy = jest.spyOn(bcryptService, 'compare').mockResolvedValue(false);
+    await expect(
+      service.changePassword(user.id, 'password', 'newPassword'),
+    ).rejects.toThrow(UnauthorizedException);
   });
 });

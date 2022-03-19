@@ -1,9 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Role, User, UserMentor } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import * as _ from 'lodash';
+import { SearchMentorDto } from './dtos/search-mentor.dto';
+import { classToPlain } from 'class-transformer';
+import { MentorResponseDto } from './dtos/mentor-response.dto';
 
 @Injectable()
 export class MentorService {
@@ -110,5 +113,51 @@ export class MentorService {
         },
       },
     });
+  }
+
+  async searchMentor(search: SearchMentorDto) {
+    const mentors = await this.prisma.user.findMany({
+      where: {
+        name: {
+          search: search.keyword,
+        },
+        User_mentor: {
+          //isAccepted: true,
+          categoryId: search.category,
+          skills: {
+            some: {
+              skillId: {
+                in: search.skills,
+              },
+            },
+          },
+        },
+      },
+      include: {
+        User_mentor: {
+          include: {
+            category: true,
+            skills: {
+              include: {
+                skill: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return mentors.map((mentor: Partial<User> | any) => {
+      mentor.User_mentor = _.omit(mentor.User_mentor, [
+        'userId',
+        'categoryId',
+        'isAccepted',
+        'createAt',
+      ]);
+      mentor.User_mentor.skills = mentor.User_mentor.skills.map(
+        (skill: any) => skill.skill,
+      );
+      return mentor;
+    });
+    //return mentors;
   }
 }
