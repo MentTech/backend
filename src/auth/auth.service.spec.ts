@@ -177,7 +177,7 @@ describe('AuthService', () => {
       );
       const data = await service.googleTokenLogin(token);
       expect(data.accessToken).toEqual('token');
-      expect(service.logInByEmail).toBeCalledWith(user.email, user.name);
+      expect(service.logInByEmail).toBeCalled();
     });
 
     it('should throw error if google token is invalid', async () => {

@@ -31,9 +31,8 @@ export class AuthService {
 
     const hashedPassword = await this.createHashedPassword(password);
     const newUser: CreateUserDto = {
-      email: credentials.email,
+      ...credentials,
       password: hashedPassword,
-      name: credentials.name,
     };
     try {
       const user = await this.usersService.createUser(newUser, Role.MENTEE);
@@ -76,19 +75,20 @@ export class AuthService {
           `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`,
         ),
       );
-      return this.logInByEmail(data.email, data.name);
+      return this.logInByEmail(data.email, data.name, data.picture);
     } catch (e) {
       throw new UnauthorizedException('Please check your login credential');
     }
   }
 
-  async logInByEmail(email: string, name: string) {
+  async logInByEmail(email: string, name: string, avatar?: string) {
     let user = await this.usersService.findByEmail(email);
     if (!user) {
       user = await this.signUp({
         email: email,
         password: randomBytes(16).toString('hex'),
         name: name,
+        avatar,
       });
     }
     const payload: JwtPayload = { id: user.id };
