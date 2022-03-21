@@ -5,8 +5,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import * as _ from 'lodash';
 import { SearchMentorDto } from './dtos/search-mentor.dto';
-import { classToPlain } from 'class-transformer';
-import { MentorResponseDto } from './dtos/mentor-response.dto';
 
 @Injectable()
 export class MentorService {
@@ -121,8 +119,9 @@ export class MentorService {
         name: {
           search: search.keyword,
         },
+        isActive: true,
         User_mentor: {
-          //isAccepted: true,
+          isAccepted: true,
           categoryId: search.category,
           skills: {
             some: {
@@ -142,22 +141,51 @@ export class MentorService {
                 skill: true,
               },
             },
+            degree: true,
+            experiences: true,
           },
         },
       },
     });
     return mentors.map((mentor: Partial<User> | any) => {
-      mentor.User_mentor = _.omit(mentor.User_mentor, [
-        'userId',
-        'categoryId',
-        'isAccepted',
-        'createAt',
-      ]);
       mentor.User_mentor.skills = mentor.User_mentor.skills.map(
         (skill: any) => skill.skill,
       );
       return mentor;
     });
-    //return mentors;
+  }
+
+  async getMentor(id: number, activeOnly: boolean = true) {
+    const mentor = await this.prisma.user.findFirst({
+      where: {
+        id,
+        role: Role.MENTOR,
+        isActive: activeOnly ? true : undefined,
+        User_mentor: {
+          isAccepted: activeOnly ? true : undefined,
+        },
+      },
+      include: {
+        User_mentor: {
+          include: {
+            category: true,
+            skills: {
+              include: {
+                skill: true,
+              },
+            },
+            degree: true,
+            experiences: true,
+          },
+        },
+      },
+    });
+    if (!mentor) {
+      throw new NotFoundException('Mentor not found');
+    }
+    mentor.User_mentor.skills = mentor.User_mentor.skills.map(
+      (skill: any) => skill.skill,
+    );
+    return mentor;
   }
 }

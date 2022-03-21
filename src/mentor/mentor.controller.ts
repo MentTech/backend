@@ -13,7 +13,6 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -21,7 +20,6 @@ import { Role } from '@prisma/client';
 import JwtAuthenticationGuard from '../auth/guards/jwt-authentiacation.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
-import { Serialize } from '../interceptors/serialize.interceptor';
 import { AcceptMentorDto } from './dtos/accept-mentor.dto';
 import { MentorQueryDto } from './dtos/mentor-query.dto';
 import { MentorResponseDto } from './dtos/mentor-response.dto';
@@ -68,8 +66,39 @@ export class MentorController {
   @Get('/search')
   @UseInterceptors(ClassSerializerInterceptor)
   @ApiOperation({ summary: 'Search mentor' })
+  @ApiResponse({
+    status: 200,
+    type: [MentorResponseDto],
+  })
   async searchMentor(@Query() query: SearchMentorDto) {
     const mentors = await this.mentorService.searchMentor(query);
     return mentors.map((mentor) => new MentorResponseDto(mentor));
+  }
+
+  @Get('/:id')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiOperation({ summary: 'Get mentor by id' })
+  @ApiResponse({
+    status: 200,
+    type: MentorResponseDto,
+  })
+  async getMentor(@Param('id') id: string) {
+    const mentor = await this.mentorService.getMentor(+id);
+    return new MentorResponseDto(mentor as any);
+  }
+
+  @Get('/:id/admin')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Get mentor by id (admin route)' })
+  @ApiResponse({
+    status: 200,
+    type: MentorResponseDto,
+  })
+  @ApiBearerAuth()
+  async getMentorAdmin(@Param('id') id: string) {
+    const mentor = await this.mentorService.getMentor(+id, false);
+    return new MentorResponseDto(mentor as any);
   }
 }

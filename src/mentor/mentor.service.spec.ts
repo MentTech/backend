@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Role } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
@@ -56,6 +57,7 @@ const mentorR = {
       id: form.categoryId,
       name: 'category',
     },
+    skills: [],
   },
 };
 
@@ -114,5 +116,28 @@ describe('MentorService', () => {
     const mentor = await service.acceptMentor(1);
     expect(mentor).toEqual(mentorR);
     expect(prisma.user.update).toBeCalled();
+  });
+
+  it('should search for mentor', async () => {
+    prisma.user.findMany = jest.fn().mockResolvedValue([mentorR]);
+    const mentors = await service.searchMentor({
+      category: 1,
+      skills: [1],
+    });
+    expect(prisma.user.findMany).toBeCalled();
+  });
+
+  describe('Get mentor by id', () => {
+    it('should get mentor by id', async () => {
+      const mentor = await service.getMentor(1);
+      expect(mentor).toEqual(mentorR);
+      expect(prisma.user.findFirst).toBeCalled();
+    });
+
+    it('should throw error if mentor is not exist', async () => {
+      prisma.user.findFirst = jest.fn().mockResolvedValue(null);
+      await expect(service.getMentor(1)).rejects.toThrow(NotFoundException);
+      expect(prisma.user.findFirst).toBeCalled();
+    });
   });
 });
