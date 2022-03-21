@@ -72,10 +72,16 @@ export class AuthController {
     return this.authService.googleLogin(req);
   }
 
-  @Get('/google/token')
+  @Post('/google/token')
   @ApiOperation({ summary: 'log in with google token' })
   googleTokenLogin(@Query('token') token: string) {
     return this.authService.googleTokenLogin(token);
+  }
+
+  @Post('/facebook/token')
+  @ApiOperation({ summary: 'log in with facebook token' })
+  facebookTokenLogin(@Query('token') token: string) {
+    return this.authService.facebookTokenLogin(token);
   }
 
   @Post('/signIn/admin')

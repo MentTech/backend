@@ -81,6 +81,15 @@ export class AuthService {
     }
   }
 
+  async facebookTokenLogin(accessToken: string) {
+    try {
+      const { data } = await firstValueFrom(this.httpService.get(`https://graph.facebook.com/me?fields=name,email,picture&access_token=${accessToken}`));
+      return this.logInByEmail(data.email, data.name);
+    } catch (e) {
+      throw new UnauthorizedException('Please check your login credential');
+    }
+  }
+
   async logInByEmail(email: string, name: string, avatar?: string) {
     let user = await this.usersService.findByEmail(email);
     if (!user) {
