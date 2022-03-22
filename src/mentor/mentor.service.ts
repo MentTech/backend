@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Role, User, UserMentor } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
@@ -80,6 +80,8 @@ export class MentorService {
             jobs: true,
             achievements: true,
             skills: true,
+            programs: true,
+            category: true,
           },
         },
       },
@@ -168,6 +170,7 @@ export class MentorService {
       include: {
         User_mentor: {
           include: {
+            programs: true,
             category: true,
             skills: {
               include: {

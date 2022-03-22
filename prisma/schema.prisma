@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
@@ -35,6 +35,7 @@ model UserMentor {
   jobs         Job[]
   achievements Achievement[]
   skills       SkillsOnMentors[]
+  programs     Program[]
   categoryId   Int
   category     Category          @relation(fields: [categoryId], references: [id])
   introduction String
@@ -113,6 +114,16 @@ model SkillsOnMentors {
   createdAt DateTime   @default(now())
 
   @@id([mentorId, skillId])
+}
+
+model Program {
+  id       Int        @id @default(autoincrement())
+  mentorId Int
+  mentor   UserMentor @relation(fields: [mentorId], references: [userId])
+  title    String
+  detail   String
+  credit   Int
+  createAt DateTime   @default(now())
 }
 
 enum Role {
