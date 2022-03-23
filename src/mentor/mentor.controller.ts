@@ -26,6 +26,7 @@ import { MentorResponseDto } from './dtos/mentor-response.dto';
 import { SearchMentorDto } from './dtos/search-mentor.dto';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import { MentorService } from './mentor.service';
+import { PaginationResponseDto } from '../dtos/pagination-response.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -68,11 +69,14 @@ export class MentorController {
   @ApiOperation({ summary: 'Search mentor' })
   @ApiResponse({
     status: 200,
-    type: [MentorResponseDto],
+    type: PaginationResponseDto,
   })
   async searchMentor(@Query() query: SearchMentorDto) {
-    const mentors = await this.mentorService.searchMentor(query);
-    return mentors.map((mentor) => new MentorResponseDto(mentor));
+    const response = await this.mentorService.searchMentor(query);
+    response.data = response.data.map(
+      (mentor) => new MentorResponseDto(mentor),
+    );
+    return response;
   }
 
   @Get('/:id')

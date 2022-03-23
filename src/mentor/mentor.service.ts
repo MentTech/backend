@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import { Prisma, Role, User } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import * as _ from 'lodash';
 import { SearchMentorDto } from './dtos/search-mentor.dto';
+import { PaginationResponseDto } from 'src/dtos/pagination-response.dto';
+import { MentorResponseDto } from './dtos/mentor-response.dto';
 
 @Injectable()
 export class MentorService {
@@ -116,27 +118,38 @@ export class MentorService {
   }
 
   async searchMentor(search: SearchMentorDto) {
-    const mentors = await this.prisma.user.findMany({
-      where: {
-        name: {
-          search: search.keyword,
-        },
-        isActive: true,
-        User_mentor: {
-          isAccepted: true,
-          categoryId: search.category,
-          skills: {
-            some: {
-              skillId: {
-                in: search.skills,
-              },
+    const { page, limit, order, orderBy } = search;
+    const query: Prisma.UserWhereInput = {
+      name: {
+        search: search.keyword,
+      },
+      isActive: true,
+      User_mentor: {
+        isAccepted: true,
+        categoryId: search.category,
+        skills: {
+          some: {
+            skillId: {
+              in: search.skills,
             },
           },
         },
       },
+    };
+    const totalPage = await this.prisma.user.count({
+      where: query,
+    });
+    const mentors = await this.prisma.user.findMany({
+      take: limit,
+      skip: (page - 1) * limit,
+      orderBy: {
+        [orderBy]: order,
+      },
+      where: query,
       include: {
         User_mentor: {
           include: {
+            programs: true,
             category: true,
             skills: {
               include: {
@@ -149,12 +162,18 @@ export class MentorService {
         },
       },
     });
-    return mentors.map((mentor: Partial<User> | any) => {
+    const filteredMentors = mentors.map((mentor: Partial<User> | any) => {
       mentor.User_mentor.skills = mentor.User_mentor.skills.map(
         (skill: any) => skill.skill,
       );
       return mentor;
     });
+    return {
+      totalPage,
+      page,
+      limit,
+      data: filteredMentors,
+    } as PaginationResponseDto<MentorResponseDto>;
   }
 
   async getMentor(id: number, activeOnly: boolean = true) {

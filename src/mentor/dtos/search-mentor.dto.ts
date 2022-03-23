@@ -1,8 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { PaginationDto } from '../../dtos/pagination.dto';
 
-export class SearchMentorDto {
+export class SearchMentorDto implements PaginationDto {
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({
@@ -33,14 +34,32 @@ export class SearchMentorDto {
   @ApiPropertyOptional({
     example: 'price',
   })
-  sortBy?: string;
+  orderBy: string = 'date';
 
   @IsBoolean()
-  @IsOptional()
   @Type(() => Boolean)
   @ApiPropertyOptional({
-    default: false,
-    type: Boolean,
+    default: 'desc',
+    description: 'asc or desc',
+    type: String,
   })
-  order?: boolean;
+  order: 'asc' | 'desc' = 'desc';
+
+  @IsNumber()
+  @Type(() => Number)
+  @ApiPropertyOptional({
+    example: 1,
+    default: 1,
+    type: Number,
+  })
+  page: number = 1;
+
+  @IsNumber()
+  @Type(() => Number)
+  @ApiPropertyOptional({
+    example: 10,
+    default: 10,
+    type: Number,
+  })
+  limit: number = 10;
 }

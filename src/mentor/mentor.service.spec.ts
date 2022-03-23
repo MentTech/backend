@@ -67,6 +67,7 @@ const mockPrismaService = {
     findMany: jest.fn().mockResolvedValue([mentorR]),
     update: jest.fn().mockReturnValue(mentorR),
     findFirst: jest.fn().mockResolvedValue(mentorR),
+    count: jest.fn().mockResolvedValue(1),
   },
 };
 const mockAuthService = {
@@ -120,9 +121,13 @@ describe('MentorService', () => {
 
   it('should search for mentor', async () => {
     prisma.user.findMany = jest.fn().mockResolvedValue([mentorR]);
-    const mentors = await service.searchMentor({
+    await service.searchMentor({
       category: 1,
       skills: [1],
+      orderBy: 'name',
+      order: false,
+      page: 1,
+      limit: 10,
     });
     expect(prisma.user.findMany).toBeCalled();
   });
