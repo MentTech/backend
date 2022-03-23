@@ -25,7 +25,6 @@ class UserMentorResponseDto {
 }
 
 export class MentorResponseDto {
-  @Exclude()
   @ApiProperty({
     example: '1',
   })

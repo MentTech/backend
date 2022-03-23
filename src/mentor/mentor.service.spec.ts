@@ -125,7 +125,7 @@ describe('MentorService', () => {
       category: 1,
       skills: [1],
       orderBy: 'name',
-      order: false,
+      order: 'asc',
       page: 1,
       limit: 10,
     });
