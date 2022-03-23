@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, Role } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
 const prisma = new PrismaClient();
@@ -51,7 +51,7 @@ const phoneNumbers = Array.from({ length: 20 }, () => {
 });
 
 const avatars = Array.from({ length: 20 }, () => {
-  return `https://i.pravatar.cc/300?img=${Math.floor(Math.random() * 500)}`;
+  return `https://i.pravatar.cc/300?img=${Math.floor(Math.random() * 70)}`;
 });
 
 const linkedinUrls = Array.from({ length: 20 }, () => {
@@ -191,6 +191,7 @@ const createUserInput = (
   const skills = skillIds.slice(rand, rand + 3);
   return {
     name,
+    role: Role.MENTOR,
     password: 'asdklj',
     email,
     birthday: birthdate,
