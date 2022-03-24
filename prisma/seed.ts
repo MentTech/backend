@@ -18,14 +18,6 @@ const namePool = [
   'John',
 ];
 
-// const emailPool = Array.from({ length: 20 }, () => {
-//   const name = namePool[Math.floor(Math.random() * namePool.length)];
-//   const domain = ['gmail.com', 'yahoo.com', 'hotmail.com'][
-//     Math.floor(Math.random() * 3)
-//   ];
-//   return `${name}@${domain}`;
-// });
-
 //create random email function
 const randomEmail = () => {
   const name =
@@ -166,6 +158,17 @@ const categoryString = [
   'Security',
 ];
 
+const programTitles = [
+  'CV Review',
+  'Job Mock Interview',
+  'Introductory',
+  'Career Orientation',
+  'Technical Interview',
+  'Technical Test',
+  'Interview preparation',
+  'Other',
+];
+
 const createUserInput = (
   skillIds: number[],
   categoryIds: number[],
@@ -232,6 +235,22 @@ const createUserInput = (
             skill: { connect: { id: skill } },
           })),
         },
+        programs: {
+          create: [
+            {
+              title:
+                programTitles[Math.floor(Math.random() * programTitles.length)],
+              detail: 'test1',
+              credit: 100,
+            },
+            {
+              title:
+                programTitles[Math.floor(Math.random() * programTitles.length)],
+              detail: 'test2',
+              credit: 200,
+            },
+          ],
+        },
       },
     },
   };
@@ -263,9 +282,8 @@ async function main() {
   const sIds = skillIds.map((skill) => skill.id);
   const cIds = categoryIds.map((category) => category.id);
 
-  const mentorCreate: Prisma.UserCreateInput[] = Array.from(
-    { length: 10 },
-    () => createUserInput(sIds, cIds),
+  const mentorCreate: Prisma.UserCreateInput[] = Array.from({ length: 5 }, () =>
+    createUserInput(sIds, cIds),
   );
 
   const mentors = await Promise.all(
