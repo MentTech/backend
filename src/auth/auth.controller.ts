@@ -90,6 +90,12 @@ export class AuthController {
     return this.authService.signIn(credential, Role.ADMIN);
   }
 
+  @Post('signIn/mentor')
+  @ApiOperation({ summary: 'Mentor sign in' })
+  mentorSignIn(@Body() credential: CredentialDto) {
+    return this.authService.signIn(credential, Role.MENTOR);
+  }
+
   @Post('/changepassword')
   @UseGuards(JwtAuthenticationGuard)
   @ApiOperation({ summary: 'Change password' })
