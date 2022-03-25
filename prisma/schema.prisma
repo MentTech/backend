@@ -22,6 +22,7 @@ model User {
   avatar          String?
   isActive        Boolean           @default(true)
   coin            Int               @default(0)
+  isPasswordSet   Boolean           @default(false)
   User_mentor     UserMentor?
   RegisterHistory ProgramRegister[]
   createAt        DateTime          @default(now())

@@ -8,15 +8,15 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUser(user: CreateUserDto, role: Role) {
+  createUser(user: CreateUserDto, role: Role, isPasswordSet: boolean) {
     try {
-      const newUser = await this.prisma.user.create({
+      return this.prisma.user.create({
         data: {
           ...user,
           role,
+          isPasswordSet,
         },
       });
-      return newUser;
     } catch (err) {
       throw new BadRequestException('Email is already exist');
     }
@@ -49,6 +49,7 @@ export class UsersService {
       },
       data: {
         password,
+        isPasswordSet: true,
       },
     });
   }

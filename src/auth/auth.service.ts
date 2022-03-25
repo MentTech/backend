@@ -26,7 +26,7 @@ export class AuthService {
     return this.bcryptService.hash(password);
   }
 
-  async signUp(credentials: CreateUserDto) {
+  async signUp(credentials: CreateUserDto, isPasswordSet: boolean) {
     const { password } = credentials;
 
     const hashedPassword = await this.createHashedPassword(password);
@@ -35,11 +35,26 @@ export class AuthService {
       password: hashedPassword,
     };
     try {
-      const user = await this.usersService.createUser(newUser, Role.MENTEE);
-      return user;
+      return await this.usersService.createUser(
+        newUser,
+        Role.MENTEE,
+        isPasswordSet,
+      );
     } catch (err) {
       throw new ConflictException('email already exists');
     }
+  }
+
+  async setPassword(userId: number, password: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    if (user.isPasswordSet) {
+      throw new ConflictException('password already set');
+    }
+    const hashedPassword = await this.createHashedPassword(password);
+    return this.usersService.changePassword(userId, hashedPassword);
   }
 
   async signIn(credential: CredentialDto, role: Role) {
@@ -83,7 +98,11 @@ export class AuthService {
 
   async facebookTokenLogin(accessToken: string) {
     try {
-      const { data } = await firstValueFrom(this.httpService.get(`https://graph.facebook.com/me?fields=name,email,picture&access_token=${accessToken}`));
+      const { data } = await firstValueFrom(
+        this.httpService.get(
+          `https://graph.facebook.com/me?fields=name,email,picture&access_token=${accessToken}`,
+        ),
+      );
       return this.logInByEmail(data.email, data.name);
     } catch (e) {
       throw new UnauthorizedException('Please check your login credential');
@@ -93,12 +112,15 @@ export class AuthService {
   async logInByEmail(email: string, name: string, avatar?: string) {
     let user = await this.usersService.findByEmail(email);
     if (!user) {
-      user = await this.signUp({
-        email: email,
-        password: randomBytes(16).toString('hex'),
-        name: name,
-        avatar,
-      });
+      user = await this.signUp(
+        {
+          email: email,
+          password: randomBytes(16).toString('hex'),
+          name: name,
+          avatar,
+        },
+        false,
+      );
     }
     const payload: JwtPayload = { id: user.id };
     const jwt = this.jwtService.sign(payload);

@@ -77,19 +77,21 @@ describe('UsersService', () => {
           name: 'test',
         },
         Role.MENTEE,
+        true,
       );
       expect(user).toEqual(singleUser);
     });
 
     it('should throw email exist error', async () => {
       jest
-          .spyOn(prisma.user, 'create')
-          .mockRejectedValue(new Error('Email is already exist'));
+        .spyOn(prisma.user, 'create')
+        .mockRejectedValue(new BadRequestException('Email is already exist'));
       await expect(
-          service.createUser(
-              {email: 'test@email.com', password: 'test', name: 'test'},
-              Role.MENTEE,
-          ),
+        service.createUser(
+          { email: 'test@email.com', password: 'test', name: 'test' },
+          Role.MENTEE,
+          true,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
   });

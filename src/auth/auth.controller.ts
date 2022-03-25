@@ -23,6 +23,7 @@ import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { CredentialDto } from './dtos/credential.dto';
 import JwtAuthenticationGuard from './guards/jwt-authentiacation.guard';
+import { SetPasswordDto } from './set-password.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -41,7 +42,7 @@ export class AuthController {
     description: 'Bad request',
   })
   signUp(@Body() credentialDto: CreateUserDto) {
-    return this.authService.signUp(credentialDto);
+    return this.authService.signUp(credentialDto, true);
   }
 
   @Post('signin')
@@ -90,7 +91,7 @@ export class AuthController {
     return this.authService.signIn(credential, Role.ADMIN);
   }
 
-  @Post('signIn/mentor')
+  @Post('/signIn/mentor')
   @ApiOperation({ summary: 'Mentor sign in' })
   mentorSignIn(@Body() credential: CredentialDto) {
     return this.authService.signIn(credential, Role.MENTOR);
@@ -106,5 +107,13 @@ export class AuthController {
       body.oldPassword,
       body.newPassword,
     );
+  }
+
+  @Post('/setpassword')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Set password' })
+  @ApiBearerAuth()
+  setPassword(@Body() body: SetPasswordDto, @GetUser() user: User) {
+    return this.authService.setPassword(user.id, body.password);
   }
 }

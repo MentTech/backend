@@ -88,13 +88,13 @@ describe('AuthService', () => {
         password: 'password',
         name: 'John',
       };
-      const userR = await service.signUp(credentials);
+      const userR = await service.signUp(credentials, true);
       expect(userR).toEqual(userR);
       expect(spy).toHaveBeenCalledWith(credentials.password);
     });
 
     it('should throw error if email is exist', async () => {
-      const spy1 = jest
+      jest
         .spyOn(usersService, 'createUser')
         .mockRejectedValue(new Error('email already exists'));
       const credentials = {
@@ -102,7 +102,7 @@ describe('AuthService', () => {
         password: 'password',
         name: 'John',
       };
-      await expect(service.signUp(credentials)).rejects.toThrow(
+      await expect(service.signUp(credentials, true)).rejects.toThrow(
         ConflictException,
       );
     });
@@ -134,9 +134,7 @@ describe('AuthService', () => {
 
     it('should throw error if password is not matched', async () => {
       usersService.findByEmail = jest.fn().mockResolvedValue(user);
-      const spy2 = jest
-        .spyOn(bcryptService, 'compare')
-        .mockResolvedValue(false);
+      jest.spyOn(bcryptService, 'compare').mockResolvedValue(false);
       const credential = {
         email: 'test1@email.com',
         password: 'password1',
@@ -161,6 +159,7 @@ describe('AuthService', () => {
         avatar: '',
         coin: 0,
         createAt: new Date(),
+        isPasswordSet: true,
       });
       usersService.findByEmail = jest.fn().mockResolvedValue(null);
       const req = await service.logInByEmail(user.email, user.name);
@@ -170,7 +169,7 @@ describe('AuthService', () => {
 
     it('should sign in if user log in by google', async () => {
       const token = 'token';
-      const spy10 = jest.spyOn(service, 'logInByEmail').mockImplementation(() =>
+      jest.spyOn(service, 'logInByEmail').mockImplementation(() =>
         Promise.resolve({
           accessToken: token,
         }),
@@ -181,7 +180,7 @@ describe('AuthService', () => {
     });
 
     it('should throw error if google token is invalid', async () => {
-      const spy11 = jest
+      jest
         .spyOn(httpService, 'get')
         .mockReturnValue(throwError(() => new Error('invalid token')));
       await expect(service.googleTokenLogin('token')).rejects.toThrow(
@@ -213,7 +212,7 @@ describe('AuthService', () => {
   });
 
   it('should throw error if old password is wrong', async () => {
-    const spy = jest.spyOn(bcryptService, 'compare').mockResolvedValue(false);
+    jest.spyOn(bcryptService, 'compare').mockResolvedValue(false);
     await expect(
       service.changePassword(user.id, 'password', 'newPassword'),
     ).rejects.toThrow(UnauthorizedException);
