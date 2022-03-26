@@ -1,7 +1,17 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { PaginationDto } from '../../dtos/pagination.dto';
+
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+export enum SortBy {
+  NAME = 'name',
+  RATING = 'rating',
+}
 
 export class SearchMentorDto implements PaginationDto {
   @IsString()
@@ -29,21 +39,23 @@ export class SearchMentorDto implements PaginationDto {
   })
   skills?: number[];
 
-  @IsString()
+  @IsEnum(SortBy)
   @IsOptional()
   @ApiPropertyOptional({
-    example: 'price',
+    example: SortBy.NAME,
+    default: SortBy.NAME,
+    enum: SortBy,
   })
-  orderBy: string = 'date';
+  orderBy: string = SortBy.NAME;
 
-  @IsBoolean()
-  @Type(() => Boolean)
+  @IsEnum(SortOrder)
+  @IsOptional()
   @ApiPropertyOptional({
-    default: 'desc',
-    description: 'asc or desc',
-    type: String,
+    type: SortOrder,
+    enum: Object.values(SortOrder),
+    default: SortOrder.DESC,
   })
-  order: 'asc' | 'desc' = 'desc';
+  order: SortOrder = SortOrder.DESC;
 
   @IsNumber()
   @Type(() => Number)
