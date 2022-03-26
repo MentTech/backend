@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Role, User } from '@prisma/client';
+import { Prisma, Rating, Role, User } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { SearchMentorDto } from './dtos/search-mentor.dto';
 import { PaginationResponseDto } from 'src/dtos/pagination-response.dto';
 import { MentorResponseDto } from './dtos/mentor-response.dto';
+import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
 
 @Injectable()
 export class MentorService {
@@ -209,5 +210,37 @@ export class MentorService {
       (skill: any) => skill.skill,
     );
     return mentor;
+  }
+
+  async getAllRating(
+    mentorId: number,
+    query: GetRatingQueryDto,
+  ): Promise<PaginationResponseDto<Rating>> {
+    const { page, limit } = query;
+
+    const ratingWhereInput: Prisma.RatingWhereInput = {
+      register: {
+        program: {
+          mentorId,
+        },
+      },
+    };
+
+    const totalPage = await this.prisma.rating.count({
+      where: ratingWhereInput,
+    });
+
+    const filteredRating = await this.prisma.rating.findMany({
+      where: ratingWhereInput,
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    return {
+      page,
+      totalPage,
+      limit,
+      data: filteredRating,
+    };
   }
 }

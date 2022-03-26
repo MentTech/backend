@@ -27,6 +27,7 @@ import { SearchMentorDto } from './dtos/search-mentor.dto';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import { MentorService } from './mentor.service';
 import { PaginationResponseDto } from '../dtos/pagination-response.dto';
+import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -104,5 +105,15 @@ export class MentorController {
   async getMentorAdmin(@Param('id') id: string) {
     const mentor = await this.mentorService.getMentor(+id, false);
     return new MentorResponseDto(mentor as any);
+  }
+
+  @Get('/:id/rating')
+  @ApiOperation({ summary: 'Get mentor ratings' })
+  @ApiResponse({
+    status: 200,
+    type: PaginationResponseDto,
+  })
+  getAllRating(@Param('id') id: string, @Query() query: GetRatingQueryDto) {
+    return this.mentorService.getAllRating(+id, query);
   }
 }

@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { PaginationDto } from '../../dtos/pagination.dto';
+import { PaginationSortDto } from '../../dtos/pagination-sort.dto';
 
 export enum SortOrder {
   ASC = 'asc',
@@ -13,7 +13,7 @@ export enum SortBy {
   RATING = 'rating',
 }
 
-export class SearchMentorDto implements PaginationDto {
+export class SearchMentorDto implements PaginationSortDto {
   @IsString()
   @IsOptional()
   @ApiPropertyOptional({
