@@ -25,6 +25,7 @@ import { MentorGuard } from '../../../guards/mentor.guard';
 
 @Controller('mentor/:mentorId/program/:programId/register')
 @ApiTags('Program register')
+@ApiBearerAuth()
 export class RegisterController {
   constructor(private readonly registerService: RegisterService) {}
 
@@ -32,51 +33,60 @@ export class RegisterController {
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.MENTEE)
   @ApiOperation({ summary: 'Mentee request a session' })
-  @ApiBearerAuth()
   requestSession(@GetUser() user: User, @Param('programId') programId: string) {
     return this.registerService.requestSession(user.id, +programId);
   }
 
-  @Delete('/:id')
+  @Delete('/:sessionId')
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.MENTEE)
   @ApiOperation({ summary: 'Mentee remove an unaccepted session' })
-  @ApiBearerAuth()
-  menteeRemoveSession(@GetUser() user: User, @Param('id') sessionId: string) {
+  menteeRemoveSession(
+    @GetUser() user: User,
+    @Param('sessionId') sessionId: string,
+  ) {
     return this.registerService.menteeRemoveSession(+sessionId, user.id);
   }
 
-  @Post('/:id')
+  @Patch('/:sessionId/done')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  @ApiOperation({ summary: 'Mentee mark a session as done' })
+  menteeMarkSessionAsDone(
+    @GetUser() user: User,
+    @Param('sessionId') sessionId: string,
+  ) {
+    return this.registerService.menteeCloseSession(+sessionId, user.id);
+  }
+
+  @Post('/:sessionId')
   @UseGuards(JwtAuthenticationGuard, RolesGuard, MentorGuard)
   @Roles(Role.MENTOR)
   @ApiOperation({ summary: 'Mentor accept an unaccepted session' })
-  @ApiBearerAuth()
   @ApiParam({ name: 'mentorId', required: true })
   mentorAcceptSession(
-    @Param('id') sessionId: string,
+    @Param('sessionId') sessionId: string,
     @Body() acceptSessionDto: AcceptSessionDto,
   ) {
     return this.registerService.acceptSession(+sessionId, acceptSessionDto);
   }
 
-  @Post('/:id/reject')
+  @Post('/:sessionId/reject')
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.MENTOR)
   @ApiOperation({ summary: 'Mentor reject an unaccepted session' })
-  @ApiBearerAuth()
   @ApiParam({ name: 'mentorId', required: true })
   mentorRejectSession(
-    @Param('id') sessionId: string,
+    @Param('sessionId') sessionId: string,
     @Param('mentorId') mentorId: string,
   ) {
     return this.registerService.rejectSession(+sessionId, +mentorId);
   }
 
-  @Patch('/:id')
+  @Patch('/:sessionId')
   @UseGuards(JwtAuthenticationGuard, RolesGuard, MentorGuard)
   @Roles(Role.MENTOR)
   @ApiOperation({ summary: 'Mentor update an accepted session' })
-  @ApiBearerAuth()
   @ApiParam({ name: 'mentorId', required: true })
   mentorUpdateSession(
     @Param('id') sessionId: string,
@@ -94,7 +104,6 @@ export class RegisterController {
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.MENTOR, Role.MENTEE)
   @ApiOperation({ summary: 'Get all session' })
-  @ApiBearerAuth()
   getAllSession(@GetUser() user: User, @Param('programId') programId: string) {
     if (user.role === Role.MENTEE) {
       return this.registerService.menteeFindAll(user.id, +programId);

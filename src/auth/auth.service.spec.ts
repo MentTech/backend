@@ -15,6 +15,11 @@ const user = {
   password: 'coihakcnoilnnk,aw',
   role: Role.MENTEE,
   isActive: true,
+  birthday: new Date(),
+  coin: 0,
+  avatar: '',
+  createAt: new Date(),
+  phone: '123',
 };
 
 describe('AuthService', () => {
@@ -187,6 +192,27 @@ describe('AuthService', () => {
         UnauthorizedException,
       );
     });
+
+    it('should sign in if user log in by facebook', async () => {
+      const token = 'token';
+      jest.spyOn(service, 'logInByEmail').mockImplementation(() =>
+        Promise.resolve({
+          accessToken: token,
+        }),
+      );
+      const data = await service.facebookTokenLogin(token);
+      expect(data.accessToken).toEqual('token');
+      expect(service.logInByEmail).toBeCalled();
+    });
+
+    it('should throw error if facebook token is invalid', async () => {
+      jest
+        .spyOn(httpService, 'get')
+        .mockReturnValue(throwError(() => new Error('invalid token')));
+      await expect(service.facebookTokenLogin('token')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
   });
 
   it('should return user if user is auth', () => {
@@ -216,5 +242,29 @@ describe('AuthService', () => {
     await expect(
       service.changePassword(user.id, 'password', 'newPassword'),
     ).rejects.toThrow(UnauthorizedException);
+  });
+
+  describe('SetPassword', () => {
+    it('should set password', async () => {
+      jest.spyOn(bcryptService, 'hash').mockResolvedValue('hashedPassword');
+      const u = await service.setPassword(user.id, 'password');
+      expect(u.id).toEqual(1);
+    });
+
+    it('should throw error if user is not exist', async () => {
+      jest.spyOn(usersService, 'findById').mockResolvedValue(null);
+      await expect(service.setPassword(2, 'password')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('should throw error if password is already set', async () => {
+      jest
+        .spyOn(usersService, 'findById')
+        .mockResolvedValue({ ...user, isPasswordSet: true });
+      await expect(service.setPassword(user.id, 'password')).rejects.toThrow(
+        ConflictException,
+      );
+    });
   });
 });

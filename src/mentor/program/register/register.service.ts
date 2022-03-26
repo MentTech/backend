@@ -84,6 +84,21 @@ export class RegisterService {
     });
   }
 
+  async menteeCloseSession(sessionId: number, menteeId: number) {
+    const session = await this.prisma.programRegister.findFirst({
+      where: { id: sessionId, isAccepted: true, done: false, userId: menteeId },
+    });
+    if (!session) {
+      throw new NotFoundException('Session not found');
+    }
+    return this.prisma.programRegister.update({
+      where: { id: sessionId },
+      data: {
+        done: true,
+      },
+    });
+  }
+
   mentorFindAll(mentorId: number, programId: number) {
     return this.prisma.programRegister.findMany({
       where: {

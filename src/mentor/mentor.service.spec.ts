@@ -5,6 +5,7 @@ import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import { MentorService } from './mentor.service';
+import { SortOrder } from './dtos/search-mentor.dto';
 
 const form: SubmitMentorDto = {
   email: 'test@email.com',
@@ -125,7 +126,7 @@ describe('MentorService', () => {
       category: 1,
       skills: [1],
       orderBy: 'name',
-      order: 'asc',
+      order: SortOrder.ASC,
       page: 1,
       limit: 10,
     });
