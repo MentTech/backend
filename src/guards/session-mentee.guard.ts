@@ -34,5 +34,6 @@ export class SessionMenteeGuard implements CanActivate {
     if (!session) {
       return false;
     }
+    return true;
   }
 }
