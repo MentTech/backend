@@ -62,6 +62,12 @@ const mentorR = {
   },
 };
 
+const singleRating = {
+  id: 1,
+  rating: 5,
+  comment: 'comment',
+};
+
 const mockPrismaService = {
   user: {
     create: jest.fn().mockResolvedValue(mentorR),
@@ -69,6 +75,10 @@ const mockPrismaService = {
     update: jest.fn().mockReturnValue(mentorR),
     findFirst: jest.fn().mockResolvedValue(mentorR),
     count: jest.fn().mockResolvedValue(1),
+  },
+  rating: {
+    count: jest.fn().mockResolvedValue(10),
+    findMany: jest.fn().mockResolvedValue([singleRating]),
   },
 };
 const mockAuthService = {
@@ -145,5 +155,20 @@ describe('MentorService', () => {
       await expect(service.getMentor(1)).rejects.toThrow(NotFoundException);
       expect(prisma.user.findFirst).toBeCalled();
     });
+  });
+
+  it('should get mentor rating', async () => {
+    const query = {
+      page: 1,
+      limit: 10,
+    };
+    const rating = await service.getAllRating(1, query);
+    expect(rating).toEqual({
+      page: 1,
+      totalPage: 1,
+      limit: 10,
+      data: [singleRating],
+    });
+    expect(prisma.rating.count).toBeCalled();
   });
 });

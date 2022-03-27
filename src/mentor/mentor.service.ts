@@ -137,9 +137,11 @@ export class MentorService {
         },
       },
     };
-    const totalPage = await this.prisma.user.count({
+    const count = await this.prisma.user.count({
       where: query,
     });
+    const totalPage = Math.ceil(count / limit);
+
     const mentors = await this.prisma.user.findMany({
       take: limit,
       skip: (page - 1) * limit,
@@ -226,9 +228,11 @@ export class MentorService {
       },
     };
 
-    const totalPage = await this.prisma.rating.count({
+    const count = await this.prisma.rating.count({
       where: ratingWhereInput,
     });
+
+    const totalPage = Math.ceil(count / limit);
 
     const filteredRating = await this.prisma.rating.findMany({
       where: ratingWhereInput,
