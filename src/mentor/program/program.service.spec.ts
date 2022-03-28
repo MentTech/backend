@@ -21,6 +21,7 @@ const mockPrismaService = {
     update: jest.fn().mockResolvedValue(singleMentor),
   },
   program: {
+    create: jest.fn().mockResolvedValue(singleProgram),
     findFirst: jest.fn().mockResolvedValue(singleProgram),
     findMany: jest.fn().mockResolvedValue([singleProgram]),
     update: jest.fn().mockResolvedValue(singleProgram),
@@ -58,7 +59,7 @@ describe('ProgramService', () => {
       credit: 100,
     };
     const result = await service.create(program, 1);
-    expect(result).toEqual(singleMentor);
+    expect(result).toEqual(singleProgram);
   });
 
   it('should return all programs of a mentor', async () => {

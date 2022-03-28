@@ -1,21 +1,27 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { ProgramService } from './program.service';
 import { CreateProgramDto } from './dto/create-program.dto';
 import { UpdateProgramDto } from './dto/update-program.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Roles } from '../../decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import JwtAuthenticationGuard from '../../auth/guards/jwt-authentiacation.guard';
 import { MentorGuard } from '../../guards/mentor.guard';
+import { ProgramResponseDto } from './dto/program-response.dto';
 
 @Controller('mentor/:mentorId/program')
 @ApiTags('Mentoring program')
@@ -29,6 +35,11 @@ export class ProgramController {
     summary: 'Create new program',
   })
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 201,
+    description: 'The program has been successfully created.',
+    type: ProgramResponseDto,
+  })
   create(
     @Param('mentorId') mentorId: string,
     @Body() createProgramDto: CreateProgramDto,
@@ -40,6 +51,11 @@ export class ProgramController {
   @ApiOperation({
     summary: 'Get all programs of a mentor',
   })
+  @ApiResponse({
+    status: 200,
+    description: 'The programs have been successfully fetched.',
+    type: [ProgramResponseDto],
+  })
   findAll(@Param('mentorId') mentorId: string) {
     return this.programService.findAll(+mentorId);
   }
@@ -47,6 +63,11 @@ export class ProgramController {
   @Get(':id')
   @ApiOperation({
     summary: 'Get a program of a mentor',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The program has been successfully fetched.',
+    type: ProgramResponseDto,
   })
   findOne(@Param('id') id: string, @Param('mentorId') mentorId: string) {
     return this.programService.findOne(+id, +mentorId);
@@ -59,6 +80,11 @@ export class ProgramController {
     summary: 'Update a program of a mentor',
   })
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'The program has been successfully updated.',
+    type: ProgramResponseDto,
+  })
   update(
     @Param('id') id: string,
     @Param('mentorId') mentorId: string,
@@ -74,6 +100,10 @@ export class ProgramController {
     summary: 'Delete a program of a mentor',
   })
   @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'The program has been successfully deleted.',
+  })
   remove(@Param('id') id: string, @Param('mentorId') mentorId: string) {
     return this.programService.remove(+id, +mentorId);
   }

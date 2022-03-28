@@ -8,13 +8,13 @@ export class ProgramService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createProgramDto: CreateProgramDto, mentorId: number) {
-    return this.prisma.userMentor.update({
-      where: {
-        userId: mentorId,
-      },
+    return this.prisma.program.create({
       data: {
-        programs: {
-          create: createProgramDto,
+        ...createProgramDto,
+        mentor: {
+          connect: {
+            userId: mentorId,
+          },
         },
       },
     });
