@@ -14,6 +14,7 @@ import { CategoryModule } from './category/category.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { LogResponseMiddleware } from './middlewares/log-response.middleware';
 import { NotificationModule } from './notification/notification.module';
+import { MenteeModule } from './mentee/mentee.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { NotificationModule } from './notification/notification.module';
     CategoryModule,
     TransactionModule,
     NotificationModule,
+    MenteeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
