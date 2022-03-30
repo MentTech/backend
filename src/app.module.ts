@@ -13,6 +13,7 @@ import { SkillModule } from './skill/skill.module';
 import { CategoryModule } from './category/category.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { LogResponseMiddleware } from './middlewares/log-response.middleware';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LogResponseMiddleware } from './middlewares/log-response.middleware';
     SkillModule,
     CategoryModule,
     TransactionModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
