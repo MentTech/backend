@@ -33,6 +33,15 @@ export class MenteeController {
     return this.menteeService.findAll();
   }
 
+  @Get('/mysession')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  @ApiOperation({ summary: 'Get my session' })
+  @ApiBearerAuth()
+  getMySession(@GetUser() user: User) {
+    return this.menteeService.getMySession(user.id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.menteeService.findOne(+id);
@@ -46,14 +55,5 @@ export class MenteeController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.menteeService.remove(+id);
-  }
-
-  @Get('/mysession')
-  @UseGuards(JwtAuthenticationGuard, RolesGuard)
-  @Roles(Role.MENTEE)
-  @ApiOperation({ summary: 'Get my session' })
-  @ApiBearerAuth()
-  getMySession(@GetUser() user: User) {
-    return this.menteeService.getMySession(user.id);
   }
 }
