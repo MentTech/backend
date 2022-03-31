@@ -130,17 +130,18 @@ model Program {
 }
 
 model ProgramRegister {
-  id          Int      @id @default(autoincrement())
-  programId   Int
-  program     Program  @relation(fields: [programId], references: [id])
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  isAccepted  Boolean  @default(false)
-  done        Boolean  @default(false)
-  contactInfo String?
-  additional  Json?
-  rating      Rating?
-  createAt    DateTime @default(now())
+  id           Int       @id @default(autoincrement())
+  programId    Int
+  program      Program   @relation(fields: [programId], references: [id])
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id])
+  isAccepted   Boolean   @default(false)
+  done         Boolean   @default(false)
+  contactInfo  String?
+  additional   Json?
+  expectedDate DateTime?
+  rating       Rating?
+  createAt     DateTime  @default(now())
 }
 
 model Rating {
