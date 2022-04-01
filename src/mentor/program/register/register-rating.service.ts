@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
@@ -8,6 +12,14 @@ export class RegisterRatingService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createRating(sessionId: number, rating: CreateRatingDto) {
+    const existRating = await this.prisma.rating.findFirst({
+      where: {
+        registerId: sessionId,
+      },
+    });
+    if (existRating) {
+      throw new ConflictException('Rating already exist');
+    }
     return this.prisma.rating.create({
       data: {
         ...rating,
