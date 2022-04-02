@@ -58,7 +58,7 @@ export class RegisterResponseDto {
     type: ProgramResponseDto,
   })
   program: ProgramResponseDto;
-  @Transform(({ value }) => new ProgramResponseDto(value))
+  @Transform(({ value }) => new UserProgramDto(value))
   @ApiProperty({
     type: UserProgramDto,
   })
