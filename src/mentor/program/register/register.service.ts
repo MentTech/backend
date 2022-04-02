@@ -106,6 +106,7 @@ export class RegisterService {
       },
       include: {
         program: true,
+        user: true,
       },
     });
   }
