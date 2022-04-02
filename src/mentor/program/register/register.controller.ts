@@ -22,6 +22,7 @@ import { RolesGuard } from '../../../guards/roles.guard';
 import { GetUser } from '../../../decorators/get-user.decorator';
 import { AcceptSessionDto } from './dto/accept-session.dto';
 import { MentorGuard } from '../../../guards/mentor.guard';
+import { UpdateSessionDto } from './dto/update-session.dto';
 
 @Controller('mentor/:mentorId/program/:programId/register')
 @ApiTags('Program register')
@@ -91,12 +92,12 @@ export class RegisterController {
   mentorUpdateSession(
     @Param('id') sessionId: string,
     @Param('mentorId') mentorId: string,
-    @Body() acceptSessionDto: AcceptSessionDto,
+    @Body() updateSessionDto: UpdateSessionDto,
   ) {
     return this.registerService.mentorUpdateSession(
       +sessionId,
       +mentorId,
-      acceptSessionDto,
+      updateSessionDto,
     );
   }
 
