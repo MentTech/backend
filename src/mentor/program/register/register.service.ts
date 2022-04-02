@@ -104,6 +104,9 @@ export class RegisterService {
       where: {
         program: { id: programId, mentorId },
       },
+      include: {
+        program: true,
+      },
     });
   }
 
@@ -112,6 +115,9 @@ export class RegisterService {
       where: {
         program: { id: programId },
         user: { id: menteeId },
+      },
+      include: {
+        program: true,
       },
     });
   }

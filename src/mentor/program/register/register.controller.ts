@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -7,12 +8,14 @@ import {
   Patch,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { RegisterService } from './register.service';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import JwtAuthenticationGuard from '../../../auth/guards/jwt-authentiacation.guard';
@@ -23,6 +26,7 @@ import { GetUser } from '../../../decorators/get-user.decorator';
 import { AcceptSessionDto } from './dto/accept-session.dto';
 import { MentorGuard } from '../../../guards/mentor.guard';
 import { UpdateSessionDto } from './dto/update-session.dto';
+import { RegisterResponseDto } from './dto/register-response.dto';
 
 @Controller('mentor/:mentorId/program/:programId/register')
 @ApiTags('Program register')
@@ -104,12 +108,25 @@ export class RegisterController {
   @Get('/')
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.MENTOR, Role.MENTEE)
+  @UseInterceptors(ClassSerializerInterceptor)
   @ApiOperation({ summary: 'Get all session' })
-  getAllSession(@GetUser() user: User, @Param('programId') programId: string) {
+  @ApiResponse({
+    status: 200,
+    description: 'Successful operation',
+    type: [RegisterResponseDto],
+  })
+  async getAllSession(
+    @GetUser() user: User,
+    @Param('programId') programId: string,
+  ) {
     if (user.role === Role.MENTEE) {
       return this.registerService.menteeFindAll(user.id, +programId);
     } else if (user.role === Role.MENTOR) {
-      return this.registerService.mentorFindAll(user.id, +programId);
+      const sessions = await this.registerService.mentorFindAll(
+        user.id,
+        +programId,
+      );
+      return sessions.map((session: any) => new RegisterResponseDto(session));
     }
   }
 }

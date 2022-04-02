@@ -110,6 +110,7 @@ describe('RegisterService', () => {
     it('should accept session', async () => {
       const result = await service.acceptSession(1, {
         contactInfo: 'asd',
+        expectedDate: new Date(),
       });
       expect(prisma.programRegister.findFirst).toBeCalled();
       expect(prisma.programRegister.update).toBeCalled();
@@ -121,6 +122,7 @@ describe('RegisterService', () => {
       await expect(
         service.acceptSession(1, {
           contactInfo: 'asd',
+          expectedDate: new Date(),
         }),
       ).rejects.toThrowError(NotFoundException);
     });
@@ -130,6 +132,7 @@ describe('RegisterService', () => {
       await expect(
         service.acceptSession(1, {
           contactInfo: 'asd',
+          expectedDate: new Date(),
         }),
       ).rejects.toThrowError(UnprocessableEntityException);
     });
