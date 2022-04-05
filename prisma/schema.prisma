@@ -25,6 +25,7 @@ model User {
   isPasswordSet   Boolean           @default(false)
   User_mentor     UserMentor?
   RegisterHistory ProgramRegister[]
+  transactions    UserTransaction[]
   createAt        DateTime          @default(now())
 }
 
@@ -151,6 +152,33 @@ model Rating {
   rating     Float           @default(0)
   comment    String?
   createAt   DateTime        @default(now())
+}
+
+model UserTransaction {
+  id        Int               @id @default(autoincrement())
+  userId    Int
+  user      User              @relation(fields: [userId], references: [id])
+  amount    Int               @default(0)
+  type      TransactionType
+  message   String            @default("")
+  status    TransactionStatus @default(PENDING)
+  relatedId String?
+  createAt  DateTime          @default(now())
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  HOLD
+}
+
+enum TransactionType {
+  TOPUP
+  WITHDRAW
+  APPLY
+  RECEIVE
+  TRANSFER
 }
 
 enum Role {

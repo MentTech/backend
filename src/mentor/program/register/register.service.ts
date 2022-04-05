@@ -29,6 +29,19 @@ export class RegisterService {
     if (!mentee) {
       throw new NotFoundException('Mentee not found');
     }
+    const registers = await this.prisma.programRegister.findMany({
+      where: {
+        user: { id: menteeId },
+        program: { id: programId },
+      },
+    });
+    registers.forEach((e) => {
+      if (e.done) {
+        throw new UnprocessableEntityException(
+          'You have already registered for this program',
+        );
+      }
+    });
     if (!this.transactionService.checkBalance(menteeId, program.credit)) {
       throw new UnprocessableEntityException('Not enough balance');
     }
