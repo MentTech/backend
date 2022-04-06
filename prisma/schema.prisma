@@ -142,6 +142,7 @@ model ProgramRegister {
   additional   Json?
   expectedDate DateTime?
   rating       Rating?
+  relatedId    String?
   createAt     DateTime  @default(now())
 }
 

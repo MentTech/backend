@@ -86,9 +86,112 @@ export class TransactionCoinService {
         data: {
           user: { connect: { id: menteeId } },
           program: { connect: { id: programId } },
+          relatedId: uniqueId,
         },
       }),
     ]);
     await this.calculateBalance(menteeId);
+  }
+
+  async findSessions(sessionId: number) {
+    const session = await this.prisma.programRegister.findFirst({
+      where: {
+        id: sessionId,
+      },
+    });
+    if (!session) {
+      throw new NotFoundException('Session not found');
+    }
+    const transactions = await this.prisma.userTransaction.findMany({
+      where: {
+        relatedId: session.relatedId,
+      },
+    });
+    if (transactions.length !== 2) {
+      throw new NotFoundException('Transaction not found');
+    }
+    let menteeTransaction: number;
+    let mentorTransaction: number;
+    transactions.forEach((t) => {
+      if (t.userId === session.userId) {
+        if (t.status !== TransactionStatus.HOLD) {
+          throw new UnprocessableEntityException('Transaction not hold');
+        }
+        menteeTransaction = t.id;
+      } else {
+        if (t.status !== TransactionStatus.PENDING) {
+          throw new UnprocessableEntityException('Transaction not pending');
+        }
+        mentorTransaction = t.id;
+      }
+    });
+    return {
+      mentor: mentorTransaction,
+      mentee: menteeTransaction,
+    };
+  }
+
+  async completeSession(sessionId: number) {
+    const transactions = await this.findSessions(sessionId);
+    const { mentor, mentee } = transactions;
+    await this.prisma.$transaction([
+      this.prisma.userTransaction.update({
+        where: {
+          id: mentee,
+        },
+        data: {
+          status: TransactionStatus.SUCCESS,
+        },
+      }),
+      this.prisma.userTransaction.update({
+        where: {
+          id: mentor,
+        },
+        data: {
+          status: TransactionStatus.SUCCESS,
+        },
+      }),
+      this.prisma.programRegister.update({
+        where: {
+          id: sessionId,
+        },
+        data: {
+          isAccepted: true,
+          done: true,
+        },
+      }),
+    ]);
+  }
+
+  async mentorRefuseSession(sessionId: number) {
+    const transactions = await this.findSessions(sessionId);
+    const { mentor, mentee } = transactions;
+    await this.prisma.$transaction([
+      this.prisma.userTransaction.update({
+        where: {
+          id: mentee,
+        },
+        data: {
+          status: TransactionStatus.FAILED,
+        },
+      }),
+      this.prisma.userTransaction.update({
+        where: {
+          id: mentor,
+        },
+        data: {
+          status: TransactionStatus.FAILED,
+        },
+      }),
+      this.prisma.programRegister.update({
+        where: {
+          id: sessionId,
+        },
+        data: {
+          isAccepted: false,
+          done: true,
+        },
+      }),
+    ]);
   }
 }
