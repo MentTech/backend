@@ -5,8 +5,9 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { TransactionStatus, TransactionType } from '@prisma/client';
+import { GiftCode, TransactionStatus, TransactionType } from '@prisma/client';
 import { nanoid } from 'nanoid';
+import { CreateGiftCardDto } from '../dto/create-giftcard.dto';
 
 @Injectable()
 export class TransactionCoinService {
@@ -190,6 +191,80 @@ export class TransactionCoinService {
         data: {
           isAccepted: false,
           done: true,
+        },
+      }),
+    ]);
+  }
+
+  async topUp(userId: number, coin: number) {
+    await this.prisma.userTransaction.create({
+      data: {
+        userId,
+        amount: coin,
+        type: TransactionType.TOPUP,
+        status: TransactionStatus.SUCCESS,
+        message: 'Top up',
+      },
+    });
+    await this.calculateBalance(userId);
+  }
+
+  async withdraw(userId: number, coin: number) {
+    await this.prisma.userTransaction.create({
+      data: {
+        userId,
+        amount: -coin,
+        type: TransactionType.WITHDRAW,
+        status: TransactionStatus.SUCCESS,
+        message: 'Withdraw',
+      },
+    });
+    await this.calculateBalance(userId);
+  }
+
+  createGiftCard(dto: CreateGiftCardDto): Promise<GiftCode> {
+    return this.prisma.giftCode.create({
+      data: {
+        ...dto,
+        code: nanoid(),
+        valid: true,
+      },
+    });
+  }
+
+  async applyGiftCard(userId: number, code: string) {
+    const card = await this.prisma.giftCode.findFirst({
+      where: {
+        code,
+        valid: true,
+        validFrom: { lte: new Date() },
+        validTo: { gte: new Date() },
+        usageLeft: { gt: 0 },
+      },
+    });
+    if (!card) {
+      throw new NotFoundException('Gift card not found');
+    }
+    this.prisma.$transaction([
+      this.prisma.giftCode.update({
+        where: {
+          code,
+        },
+        data: {
+          usageLeft: card.usageLeft - 1,
+        },
+      }),
+      this.prisma.userTransaction.create({
+        data: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          amount: card.coin,
+          type: TransactionType.TOPUP,
+          status: TransactionStatus.SUCCESS,
+          message: 'Gift card',
         },
       }),
     ]);

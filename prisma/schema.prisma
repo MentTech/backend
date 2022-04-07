@@ -167,6 +167,18 @@ model UserTransaction {
   createAt  DateTime          @default(now())
 }
 
+model GiftCode {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  type      String
+  validFrom DateTime @default(now())
+  validTo   DateTime
+  valid     Boolean
+  usageLeft Int      @default(1)
+  coin      Int      @default(0)
+  createAt  DateTime @default(now())
+}
+
 enum TransactionStatus {
   PENDING
   SUCCESS
