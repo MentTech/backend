@@ -245,7 +245,7 @@ export class TransactionCoinService {
     if (!card) {
       throw new NotFoundException('Gift card not found');
     }
-    this.prisma.$transaction([
+    await this.prisma.$transaction([
       this.prisma.giftCode.update({
         where: {
           code,
@@ -268,5 +268,6 @@ export class TransactionCoinService {
         },
       }),
     ]);
+    await this.calculateBalance(userId);
   }
 }
