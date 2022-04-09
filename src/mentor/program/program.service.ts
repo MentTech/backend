@@ -4,12 +4,15 @@ import { UpdateProgramDto } from './dto/update-program.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { GetRatingQueryDto } from '../dtos/get-rating-query.dto';
 import { Prisma } from '@prisma/client';
-import { PaginationResponseDto } from '../../dtos/pagination-response.dto';
 import { AverageResponseDto } from '../../dtos/average-response.dto';
+import { RatingService } from '../../rating/rating.service';
 
 @Injectable()
 export class ProgramService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ratingService: RatingService,
+  ) {}
 
   create(createProgramDto: CreateProgramDto, mentorId: number) {
     return this.prisma.program.create({
@@ -56,8 +59,7 @@ export class ProgramService {
     });
   }
 
-  async getRatings(programId: number, query: GetRatingQueryDto) {
-    const { page, limit } = query;
+  getRatings(programId: number, query: GetRatingQueryDto) {
     const ratingWhereInput: Prisma.RatingWhereInput = {
       register: {
         program: {
@@ -65,26 +67,7 @@ export class ProgramService {
         },
       },
     };
-
-    const count = await this.prisma.rating.count({
-      where: ratingWhereInput,
-    });
-
-    const totalPage = Math.ceil(count / limit);
-
-    const filteredRating = await this.prisma.rating.findMany({
-      where: ratingWhereInput,
-      take: limit,
-      skip: (page - 1) * limit,
-    });
-
-    const res = {
-      page,
-      totalPage,
-      limit,
-      data: filteredRating,
-    };
-    return new PaginationResponseDto(res);
+    return this.ratingService.getRatingsPagination(ratingWhereInput, query);
   }
 
   async averageRating(programId: number) {

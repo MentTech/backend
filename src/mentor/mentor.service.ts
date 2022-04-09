@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Rating, Role, User } from '@prisma/client';
+import { Prisma, Role, User } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
@@ -9,12 +9,14 @@ import { PaginationResponseDto } from 'src/dtos/pagination-response.dto';
 import { MentorResponseDto } from './dtos/mentor-response.dto';
 import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
 import { AverageResponseDto } from '../dtos/average-response.dto';
+import { RatingService } from '../rating/rating.service';
 
 @Injectable()
 export class MentorService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly authService: AuthService,
+    private readonly ratingService: RatingService,
   ) {}
 
   async submitMentor(form: SubmitMentorDto) {
@@ -215,12 +217,7 @@ export class MentorService {
     return mentor;
   }
 
-  async getAllRating(
-    mentorId: number,
-    query: GetRatingQueryDto,
-  ): Promise<PaginationResponseDto<Rating>> {
-    const { page, limit } = query;
-
+  getAllRating(mentorId: number, query: GetRatingQueryDto) {
     const ratingWhereInput: Prisma.RatingWhereInput = {
       register: {
         program: {
@@ -228,25 +225,7 @@ export class MentorService {
         },
       },
     };
-
-    const count = await this.prisma.rating.count({
-      where: ratingWhereInput,
-    });
-
-    const totalPage = Math.ceil(count / limit);
-
-    const filteredRating = await this.prisma.rating.findMany({
-      where: ratingWhereInput,
-      take: limit,
-      skip: (page - 1) * limit,
-    });
-
-    return {
-      page,
-      totalPage,
-      limit,
-      data: filteredRating,
-    };
+    return this.ratingService.getRatingsPagination(ratingWhereInput, query);
   }
 
   async averageRating(mentorId: number): Promise<AverageResponseDto> {

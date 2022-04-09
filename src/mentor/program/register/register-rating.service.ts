@@ -6,10 +6,14 @@ import {
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { UpdateRatingDto } from './dto/update-rating.dto';
+import { RatingService } from '../../../rating/rating.service';
 
 @Injectable()
 export class RegisterRatingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly ratingService: RatingService,
+  ) {}
 
   async createRating(sessionId: number, rating: CreateRatingDto) {
     const existRating = await this.prisma.rating.findFirst({
@@ -33,18 +37,25 @@ export class RegisterRatingService {
   }
 
   async getRatings(sessionId: number, mentee: number) {
-    const ratings = await this.prisma.rating.findFirst({
+    const rating = await this.prisma.rating.findFirst({
       where: {
         register: {
           id: sessionId,
           userId: mentee,
         },
       },
+      include: {
+        register: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
-    if (!ratings) {
+    if (!rating) {
       throw new NotFoundException('Rating not found');
     }
-    return ratings;
+    return this.ratingService.transformRating(rating);
   }
 
   async updateRating(

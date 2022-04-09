@@ -5,9 +5,10 @@ import { TransactionModule } from '../../../transaction/transaction.module';
 import { PrismaModule } from '../../../prisma/prisma.module';
 import { RegisterRatingService } from './register-rating.service';
 import { RegisterRatingController } from './register-rating.controller';
+import { RatingModule } from '../../../rating/rating.module';
 
 @Module({
-  imports: [TransactionModule, PrismaModule],
+  imports: [TransactionModule, PrismaModule, RatingModule],
   controllers: [RegisterController, RegisterRatingController],
   providers: [RegisterService, RegisterRatingService],
 })
