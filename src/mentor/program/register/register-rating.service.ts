@@ -33,7 +33,7 @@ export class RegisterRatingService {
   }
 
   async getRatings(sessionId: number, mentee: number) {
-    return this.prisma.rating.findFirst({
+    const ratings = await this.prisma.rating.findFirst({
       where: {
         register: {
           id: sessionId,
@@ -41,6 +41,10 @@ export class RegisterRatingService {
         },
       },
     });
+    if (!ratings) {
+      throw new NotFoundException('Rating not found');
+    }
+    return ratings;
   }
 
   async updateRating(

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ProgramService } from './program.service';
@@ -22,6 +23,9 @@ import { Role } from '@prisma/client';
 import JwtAuthenticationGuard from '../../auth/guards/jwt-authentiacation.guard';
 import { MentorGuard } from '../../guards/mentor.guard';
 import { ProgramResponseDto } from './dto/program-response.dto';
+import { GetRatingQueryDto } from '../dtos/get-rating-query.dto';
+import { PaginationResponseDto } from '../../dtos/pagination-response.dto';
+import { AverageResponseDto } from '../../dtos/average-response.dto';
 
 @Controller('mentor/:mentorId/program')
 @ApiTags('Mentoring program')
@@ -58,6 +62,32 @@ export class ProgramController {
   })
   findAll(@Param('mentorId') mentorId: string) {
     return this.programService.findAll(+mentorId);
+  }
+
+  @Get('/:id/rating')
+  @ApiOperation({
+    summary: 'Get all ratings of a program',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The ratings have been successfully fetched.',
+    type: PaginationResponseDto,
+  })
+  getRatings(@Param('id') id: string, @Query() query: GetRatingQueryDto) {
+    return this.programService.getRatings(+id, query);
+  }
+
+  @Get('/:id/rating/average')
+  @ApiOperation({
+    summary: 'Get average rating of a program',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The average rating has been successfully fetched.',
+    type: AverageResponseDto,
+  })
+  getAverageRating(@Param('id') id: string) {
+    return this.programService.averageRating(+id);
   }
 
   @Get(':id')

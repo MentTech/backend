@@ -8,6 +8,7 @@ import { SearchMentorDto } from './dtos/search-mentor.dto';
 import { PaginationResponseDto } from 'src/dtos/pagination-response.dto';
 import { MentorResponseDto } from './dtos/mentor-response.dto';
 import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
+import { AverageResponseDto } from '../dtos/average-response.dto';
 
 @Injectable()
 export class MentorService {
@@ -246,5 +247,34 @@ export class MentorService {
       limit,
       data: filteredRating,
     };
+  }
+
+  async averageRating(mentorId: number): Promise<AverageResponseDto> {
+    const ratingWhereInput: Prisma.RatingWhereInput = {
+      register: {
+        program: {
+          mentorId,
+        },
+      },
+    };
+    const count = await this.prisma.rating.count({
+      where: ratingWhereInput,
+    });
+    if (count === 0) {
+      return new AverageResponseDto({
+        average: 0,
+        count,
+      });
+    }
+    const avg = await this.prisma.rating.aggregate({
+      where: ratingWhereInput,
+      _avg: {
+        rating: true,
+      },
+    });
+    return new AverageResponseDto({
+      count,
+      average: avg._avg.rating,
+    });
   }
 }

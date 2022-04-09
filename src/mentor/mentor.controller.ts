@@ -28,6 +28,7 @@ import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import { MentorService } from './mentor.service';
 import { PaginationResponseDto } from '../dtos/pagination-response.dto';
 import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
+import { AverageResponseDto } from '../dtos/average-response.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -115,5 +116,15 @@ export class MentorController {
   })
   getAllRating(@Param('id') id: string, @Query() query: GetRatingQueryDto) {
     return this.mentorService.getAllRating(+id, query);
+  }
+
+  @Get('/:id/rating/average')
+  @ApiOperation({ summary: 'Get mentor average rating' })
+  @ApiResponse({
+    status: 200,
+    type: AverageResponseDto,
+  })
+  getAverageRating(@Param('id') id: string) {
+    return this.mentorService.averageRating(+id);
   }
 }

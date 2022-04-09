@@ -21,4 +21,8 @@ export class PaginationResponseDto<T> {
     description: 'Number of items per page',
   })
   limit: number;
+
+  constructor(c: Partial<PaginationResponseDto<T>>) {
+    Object.assign(this, c);
+  }
 }
