@@ -33,7 +33,7 @@ export class RegisterRatingService {
   }
 
   async getRatings(sessionId: number, mentee: number) {
-    return this.prisma.rating.findMany({
+    return this.prisma.rating.findFirst({
       where: {
         register: {
           id: sessionId,
