@@ -160,11 +160,11 @@ export class RegisterService {
     });
   }
 
-  menteeRemoveSession(sessionId: number, menteeId: number) {
+  async menteeRemoveSession(sessionId: number, menteeId: number) {
     if (!this.transactionService.menteeRemoveSession(sessionId, menteeId)) {
       throw new UnprocessableEntityException('Session already accepted');
     }
-    const session = this.prisma.programRegister.findFirst({
+    const session = await this.prisma.programRegister.findFirst({
       where: {
         id: sessionId,
         userId: menteeId,
@@ -175,8 +175,12 @@ export class RegisterService {
     if (!session) {
       throw new NotFoundException('Session not found');
     }
-    return this.prisma.programRegister.delete({
+    return this.prisma.programRegister.update({
       where: { id: sessionId },
+      data: {
+        isAccepted: false,
+        done: true,
+      },
     });
   }
 }
