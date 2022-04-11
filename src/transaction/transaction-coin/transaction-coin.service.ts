@@ -270,4 +270,16 @@ export class TransactionCoinService {
     ]);
     await this.calculateBalance(userId);
   }
+
+  topUpByAdmin(userId: number, coin: number) {
+    return this.prisma.userTransaction.create({
+      data: {
+        userId,
+        amount: coin,
+        type: TransactionType.TOPUP,
+        status: TransactionStatus.SUCCESS,
+        message: 'Top up',
+      },
+    });
+  }
 }

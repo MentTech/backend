@@ -8,6 +8,7 @@ import JwtAuthenticationGuard from '../auth/guards/jwt-authentiacation.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { TopUpDto } from './dto/topup.dto';
 
 @Controller('transaction')
 @ApiTags('Transaction')
@@ -32,6 +33,18 @@ export class TransactionController {
     await this.transactionService.applyGiftCard(user.id, body.code);
     return {
       message: 'Gift card applied successfully',
+    };
+  }
+
+  @Post('/topup')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'TopUp a user' })
+  @ApiBearerAuth()
+  async topUp(@Body() body: TopUpDto) {
+    await this.transactionService.topUpByAdmin(body.userId, body.amount);
+    return {
+      message: 'TopUp successfully',
     };
   }
 }
