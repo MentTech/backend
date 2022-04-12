@@ -8,6 +8,7 @@ import {PrismaService} from '../../prisma/prisma.service';
 import {GiftCode, TransactionStatus, TransactionType} from '@prisma/client';
 import {nanoid} from 'nanoid';
 import {CreateGiftCardDto} from '../dto/create-giftcard.dto';
+import {BalanceResponseDto} from "../dto/balance-response.dto";
 
 @Injectable()
 export class TransactionCoinService {
@@ -268,8 +269,8 @@ export class TransactionCoinService {
     await this.calculateBalance(userId);
   }
 
-  topUpByAdmin(userId: number, coin: number) {
-    return this.prisma.userTransaction.create({
+  async topUpByAdmin(userId: number, coin: number) {
+    const transaction = await this.prisma.userTransaction.create({
       data: {
         userId,
         amount: coin,
@@ -278,5 +279,20 @@ export class TransactionCoinService {
         message: 'Top up',
       },
     });
+    await this.calculateBalance(userId);
+    return transaction;
+  }
+
+  async getTransactions(userId: number) {
+    const transactions = await this.prisma.userTransaction.findMany({
+      where: {
+        userId,
+      },
+    });
+    const balance = await this.calculateBalance(userId);
+    return new BalanceResponseDto({
+      transactions,
+      balance,
+    })
   }
 }
