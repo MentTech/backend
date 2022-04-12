@@ -4,10 +4,10 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { GiftCode, TransactionStatus, TransactionType } from '@prisma/client';
-import { nanoid } from 'nanoid';
-import { CreateGiftCardDto } from '../dto/create-giftcard.dto';
+import {PrismaService} from '../../prisma/prisma.service';
+import {GiftCode, TransactionStatus, TransactionType} from '@prisma/client';
+import {nanoid} from 'nanoid';
+import {CreateGiftCardDto} from '../dto/create-giftcard.dto';
 
 @Injectable()
 export class TransactionCoinService {
@@ -92,6 +92,11 @@ export class TransactionCoinService {
       }),
     ]);
     await this.calculateBalance(menteeId);
+    return this.prisma.programRegister.findFirst({
+      where: {
+        relatedId: uniqueId,
+      },
+    });
   }
 
   async findSessions(sessionId: number) {
@@ -194,19 +199,11 @@ export class TransactionCoinService {
         },
       }),
     ]);
-  }
-
-  async topUp(userId: number, coin: number) {
-    await this.prisma.userTransaction.create({
-      data: {
-        userId,
-        amount: coin,
-        type: TransactionType.TOPUP,
-        status: TransactionStatus.SUCCESS,
-        message: 'Top up',
+    return this.prisma.programRegister.findFirst({
+      where: {
+        id: sessionId,
       },
     });
-    await this.calculateBalance(userId);
   }
 
   async withdraw(userId: number, coin: number) {

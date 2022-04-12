@@ -7,7 +7,7 @@ import { TransactionController } from './transaction.controller';
 @Module({
   imports: [PrismaModule],
   providers: [TransactionService, TransactionCoinService],
-  exports: [TransactionService],
+  exports: [TransactionService, TransactionCoinService],
   controllers: [TransactionController],
 })
 export class TransactionModule {}
