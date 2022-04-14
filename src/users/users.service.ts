@@ -1,20 +1,28 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Role } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserDto } from './dtos/create-user.dto';
-import { UpdateUserDto } from './dtos/update-user.dto';
+import {BadRequestException, Injectable} from '@nestjs/common';
+import {Prisma, Role} from '@prisma/client';
+import {PrismaService} from '../prisma/prisma.service';
+import {CreateUserDto} from './dtos/create-user.dto';
+import {UpdateUserDto} from './dtos/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   createUser(user: CreateUserDto, role: Role, isPasswordSet: boolean) {
+    const userCreate: Prisma.UserCreateInput = {
+      ...user,
+      role,
+      isPasswordSet,
+    }
+    if (role === Role.MENTEE) {
+      userCreate.User_mentee = {
+        create: {}
+      }
+    }
     try {
       return this.prisma.user.create({
         data: {
-          ...user,
-          role,
-          isPasswordSet,
+          ...userCreate,
         },
       });
     } catch (err) {

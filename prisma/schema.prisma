@@ -24,8 +24,10 @@ model User {
   coin            Int               @default(0)
   isPasswordSet   Boolean           @default(false)
   User_mentor     UserMentor?
+  User_mentee     MenteeProfile?    @relation("mentee_profile")
   RegisterHistory ProgramRegister[]
   transactions    UserTransaction[]
+  onWishlist      MenteeProfile[]
   createAt        DateTime          @default(now())
 }
 
@@ -177,6 +179,13 @@ model GiftCode {
   usageLeft Int      @default(1)
   coin      Int      @default(0)
   createAt  DateTime @default(now())
+}
+
+model MenteeProfile {
+  id              Int    @id @default(autoincrement())
+  userId          Int    @unique
+  user            User   @relation(fields: [userId], references: [id], name: "mentee_profile")
+  favoriteMentors User[]
 }
 
 enum TransactionStatus {
