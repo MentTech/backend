@@ -4,6 +4,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { createHash } from 'crypto';
+import { UserQueryPaginationDto } from './dtos/user-query-pagination.dto';
+import { PaginationResponseDto } from '../dtos/pagination-response.dto';
+import * as _ from 'lodash';
 
 @Injectable()
 export class UsersService {
@@ -44,8 +47,32 @@ export class UsersService {
     });
   }
 
-  findAll() {
-    return this.prisma.user.findMany({});
+  async findAll(query: UserQueryPaginationDto, role: Role) {
+    const { limit, page } = query;
+    const where: Prisma.UserWhereInput = {
+      name: {
+        search: query.search,
+      },
+      role,
+    };
+    const count = await this.prisma.user.count({
+      where,
+    });
+    const totalPage = Math.ceil(count / limit);
+    const users = await this.prisma.user.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        [query.orderBy]: query.order,
+      },
+    });
+    return new PaginationResponseDto({
+      totalPage,
+      data: users.map((user) => _.omit(user, ['password'])),
+      limit,
+      page,
+    });
   }
 
   findByEmail(email: string) {
@@ -75,6 +102,17 @@ export class UsersService {
       },
       data: {
         ...user,
+      },
+    });
+  }
+
+  lockUser(id: number) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
       },
     });
   }
