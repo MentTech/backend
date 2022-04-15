@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { genSalt, hash } from 'bcrypt';
 import { AuthService } from '../auth/auth.service';
 import { UsersService } from '../users/users.service';
 import { AdminService } from './admin.service';

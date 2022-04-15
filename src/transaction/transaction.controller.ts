@@ -1,15 +1,20 @@
-import {Body, Controller, Get, Post, UseGuards} from '@nestjs/common';
-import {TransactionCoinService} from './transaction-coin/transaction-coin.service';
-import {CreateGiftCardDto} from './dto/create-giftcard.dto';
-import {ApplyGiftCardDto} from './dto/apply-giftcard.dto';
-import {GetUser} from '../decorators/get-user.decorator';
-import {Role, User} from '@prisma/client';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { TransactionCoinService } from './transaction-coin/transaction-coin.service';
+import { CreateGiftCardDto } from './dto/create-giftcard.dto';
+import { ApplyGiftCardDto } from './dto/apply-giftcard.dto';
+import { GetUser } from '../decorators/get-user.decorator';
+import { Role, User } from '@prisma/client';
 import JwtAuthenticationGuard from '../auth/guards/jwt-authentiacation.guard';
-import {Roles} from '../decorators/roles.decorator';
-import {RolesGuard} from '../guards/roles.guard';
-import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
-import {TopUpDto} from './dto/topup.dto';
-import {BalanceResponseDto} from "./dto/balance-response.dto";
+import { Roles } from '../decorators/roles.decorator';
+import { RolesGuard } from '../guards/roles.guard';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { TopUpDto } from './dto/topup.dto';
+import { BalanceResponseDto } from './dto/balance-response.dto';
 
 @Controller('transaction')
 @ApiTags('Transaction')

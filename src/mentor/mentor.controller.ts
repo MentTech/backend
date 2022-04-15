@@ -9,21 +9,27 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import {ApiBearerAuth, ApiOkResponse, ApiOperation, ApiResponse, ApiTags,} from '@nestjs/swagger';
-import {Role} from '@prisma/client';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import JwtAuthenticationGuard from '../auth/guards/jwt-authentiacation.guard';
-import {Roles} from '../decorators/roles.decorator';
-import {RolesGuard} from '../guards/roles.guard';
-import {AcceptMentorDto} from './dtos/accept-mentor.dto';
-import {MentorQueryDto} from './dtos/mentor-query.dto';
-import {MentorResponseDto} from './dtos/mentor-response.dto';
-import {SearchMentorDto} from './dtos/search-mentor.dto';
-import {SubmitMentorDto} from './dtos/submit-mentor.dto';
-import {MentorService} from './mentor.service';
-import {PaginationResponseDto} from '../dtos/pagination-response.dto';
-import {GetRatingQueryDto} from './dtos/get-rating-query.dto';
-import {AverageResponseDto} from '../dtos/average-response.dto';
-import {SuggestQueryDto} from "./dtos/suggest-query.dto";
+import { Roles } from '../decorators/roles.decorator';
+import { RolesGuard } from '../guards/roles.guard';
+import { AcceptMentorDto } from './dtos/accept-mentor.dto';
+import { MentorQueryDto } from './dtos/mentor-query.dto';
+import { MentorResponseDto } from './dtos/mentor-response.dto';
+import { SearchMentorDto } from './dtos/search-mentor.dto';
+import { SubmitMentorDto } from './dtos/submit-mentor.dto';
+import { MentorService } from './mentor.service';
+import { PaginationResponseDto } from '../dtos/pagination-response.dto';
+import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
+import { AverageResponseDto } from '../dtos/average-response.dto';
+import { SuggestQueryDto } from './dtos/suggest-query.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')

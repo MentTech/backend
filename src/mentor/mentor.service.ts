@@ -1,15 +1,15 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
-import {Prisma, Role, User} from '@prisma/client';
-import {AuthService} from '../auth/auth.service';
-import {PrismaService} from '../prisma/prisma.service';
-import {SubmitMentorDto} from './dtos/submit-mentor.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma, Role, User } from '@prisma/client';
+import { AuthService } from '../auth/auth.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import * as _ from 'lodash';
-import {SearchMentorDto} from './dtos/search-mentor.dto';
-import {PaginationResponseDto} from 'src/dtos/pagination-response.dto';
-import {MentorResponseDto} from './dtos/mentor-response.dto';
-import {GetRatingQueryDto} from './dtos/get-rating-query.dto';
-import {AverageResponseDto} from '../dtos/average-response.dto';
-import {RatingService} from '../rating/rating.service';
+import { SearchMentorDto } from './dtos/search-mentor.dto';
+import { PaginationResponseDto } from 'src/dtos/pagination-response.dto';
+import { MentorResponseDto } from './dtos/mentor-response.dto';
+import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
+import { AverageResponseDto } from '../dtos/average-response.dto';
+import { RatingService } from '../rating/rating.service';
 
 @Injectable()
 export class MentorService {
@@ -264,17 +264,17 @@ export class MentorService {
         isAccepted: true,
         User: {
           isActive: true,
-        }
+        },
       },
       include: {
         skills: true,
-      }
+      },
     });
     if (!mentor) {
       throw new NotFoundException('Mentor not found');
     }
 
-    const skills = mentor.skills.map(skill => skill.skillId);
+    const skills = mentor.skills.map((skill) => skill.skillId);
     const category = mentor.categoryId;
 
     const whereInput: Prisma.UserWhereInput = {
@@ -300,11 +300,11 @@ export class MentorService {
           },
         ],
       },
-    }
+    };
     const mentorCount = await this.prisma.user.findMany({
       where: whereInput,
     });
-    const mentorIds = mentorCount.map(mentor => mentor.id);
+    const mentorIds = mentorCount.map((mentor) => mentor.id);
     const randomIds = _.sampleSize(mentorIds, num);
     return this.prisma.user.findMany({
       where: {
@@ -319,9 +319,9 @@ export class MentorService {
         User_mentor: {
           include: {
             experiences: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
   }
 }

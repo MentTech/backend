@@ -1,23 +1,29 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
-import {Prisma, Role} from '@prisma/client';
-import {PrismaService} from '../prisma/prisma.service';
-import {CreateUserDto} from './dtos/create-user.dto';
-import {UpdateUserDto} from './dtos/update-user.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma, Role } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   createUser(user: CreateUserDto, role: Role, isPasswordSet: boolean) {
+    if (!user.avatar) {
+      let hashedEmail = user.email.trim().toLowerCase();
+      createHash('md5').update(hashedEmail).digest('hex');
+      user.avatar = `https://www.gravatar.com/avatar/${hashedEmail}?s=200`;
+    }
     const userCreate: Prisma.UserCreateInput = {
       ...user,
       role,
       isPasswordSet,
-    }
+    };
     if (role === Role.MENTEE) {
       userCreate.User_mentee = {
-        create: {}
-      }
+        create: {},
+      };
     }
     try {
       return this.prisma.user.create({

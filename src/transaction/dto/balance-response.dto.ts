@@ -1,5 +1,5 @@
-import {UserTransaction} from "@prisma/client";
-import {ApiProperty} from "@nestjs/swagger";
+import { UserTransaction } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class BalanceResponseDto {
   @ApiProperty()
@@ -11,5 +11,4 @@ export class BalanceResponseDto {
   constructor(props: Partial<BalanceResponseDto>) {
     Object.assign(this, props);
   }
-
 }

@@ -1,8 +1,8 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
-import {CreateMenteeDto} from './dto/create-mentee.dto';
-import {UpdateMenteeDto} from './dto/update-mentee.dto';
-import {PrismaService} from '../prisma/prisma.service';
-import {Role} from "@prisma/client";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateMenteeDto } from './dto/create-mentee.dto';
+import { UpdateMenteeDto } from './dto/update-mentee.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class MenteeService {
@@ -49,14 +49,14 @@ export class MenteeService {
         favoriteMentors: {
           select: {
             id: true,
-          }
-        }
+          },
+        },
       },
     });
     if (!mentee) {
       throw new NotFoundException(`Mentee with id ${menteeId} not found`);
     }
-    return mentee.favoriteMentors.map(favoriteMentor => favoriteMentor.id);
+    return mentee.favoriteMentors.map((favoriteMentor) => favoriteMentor.id);
   }
 
   async addToFavorite(menteeId: number, mentorId: number) {
@@ -88,19 +88,19 @@ export class MenteeService {
             create: {
               favoriteMentors: {
                 connect: {
-                  id: mentorId
-                }
-              }
+                  id: mentorId,
+                },
+              },
             },
             update: {
               favoriteMentors: {
                 connect: {
-                  id: mentorId
-                }
-              }
-            }
-          }
-        }
+                  id: mentorId,
+                },
+              },
+            },
+          },
+        },
       },
     });
     return 'Successfully added to favorite';
@@ -114,10 +114,10 @@ export class MenteeService {
       data: {
         favoriteMentors: {
           disconnect: {
-            id: mentorId
-          }
-        }
-      }
+            id: mentorId,
+          },
+        },
+      },
     });
   }
 }

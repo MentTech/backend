@@ -22,6 +22,7 @@ export class AuthService {
     private readonly bcryptService: BcryptService,
     private readonly httpService: HttpService,
   ) {}
+
   async createHashedPassword(password: string) {
     return this.bcryptService.hash(password);
   }

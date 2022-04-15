@@ -4,11 +4,11 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import {PrismaService} from '../../prisma/prisma.service';
-import {GiftCode, TransactionStatus, TransactionType} from '@prisma/client';
-import {nanoid} from 'nanoid';
-import {CreateGiftCardDto} from '../dto/create-giftcard.dto';
-import {BalanceResponseDto} from "../dto/balance-response.dto";
+import { PrismaService } from '../../prisma/prisma.service';
+import { GiftCode, TransactionStatus, TransactionType } from '@prisma/client';
+import { nanoid } from 'nanoid';
+import { CreateGiftCardDto } from '../dto/create-giftcard.dto';
+import { BalanceResponseDto } from '../dto/balance-response.dto';
 
 @Injectable()
 export class TransactionCoinService {
@@ -293,6 +293,6 @@ export class TransactionCoinService {
     return new BalanceResponseDto({
       transactions,
       balance,
-    })
+    });
   }
 }

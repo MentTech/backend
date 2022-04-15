@@ -1,14 +1,23 @@
-import {Body, Controller, Delete, Get, Param, Patch, Post, UseGuards,} from '@nestjs/common';
-import {MenteeService} from './mentee.service';
-import {CreateMenteeDto} from './dto/create-mentee.dto';
-import {UpdateMenteeDto} from './dto/update-mentee.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { MenteeService } from './mentee.service';
+import { CreateMenteeDto } from './dto/create-mentee.dto';
+import { UpdateMenteeDto } from './dto/update-mentee.dto';
 import JwtAuthenticationGuard from '../auth/guards/jwt-authentiacation.guard';
-import {RolesGuard} from '../guards/roles.guard';
-import {Roles} from '../decorators/roles.decorator';
-import {Role, User} from '@prisma/client';
-import {ApiBearerAuth, ApiOperation, ApiTags} from '@nestjs/swagger';
-import {GetUser} from '../decorators/get-user.decorator';
-import {AddFavoriteDto} from "./dto/add-favorite.dto";
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../decorators/roles.decorator';
+import { Role, User } from '@prisma/client';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { GetUser } from '../decorators/get-user.decorator';
+import { AddFavoriteDto } from './dto/add-favorite.dto';
 
 @Controller('mentee')
 @ApiTags('Mentee')
@@ -48,10 +57,7 @@ export class MenteeController {
   @Roles(Role.MENTEE)
   @ApiOperation({ summary: 'Add a favorite mentor' })
   @ApiBearerAuth()
-  addFavoriteMentor(
-    @GetUser() user: User,
-    @Body() body: AddFavoriteDto,
-  ) {
+  addFavoriteMentor(@GetUser() user: User, @Body() body: AddFavoriteDto) {
     return this.menteeService.addToFavorite(user.id, body.mentorId);
   }
 
@@ -60,10 +66,7 @@ export class MenteeController {
   @Roles(Role.MENTEE)
   @ApiOperation({ summary: 'Remove a favorite mentor' })
   @ApiBearerAuth()
-  removeFavoriteMentor(
-    @GetUser() user: User,
-    @Param('id') mentorId: string,
-  ) {
+  removeFavoriteMentor(@GetUser() user: User, @Param('id') mentorId: string) {
     return this.menteeService.removeFromFavorite(user.id, +mentorId);
   }
 
