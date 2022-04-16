@@ -7,6 +7,7 @@ import { DegreeModule } from './degree/degree.module';
 import { ExperienceModule } from './experience/experience.module';
 import { ProgramModule } from './program/program.module';
 import { RatingModule } from '../rating/rating.module';
+import { AchievementModule } from './achievement/achievement.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RatingModule } from '../rating/rating.module';
     ExperienceModule,
     ProgramModule,
     RatingModule,
+    AchievementModule,
   ],
   controllers: [MentorController],
   providers: [MentorService],

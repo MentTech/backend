@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -16,7 +17,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import JwtAuthenticationGuard from '../auth/guards/jwt-authentiacation.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { RolesGuard } from '../guards/roles.guard';
@@ -30,6 +31,8 @@ import { PaginationResponseDto } from '../dtos/pagination-response.dto';
 import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
 import { AverageResponseDto } from '../dtos/average-response.dto';
 import { SuggestQueryDto } from './dtos/suggest-query.dto';
+import { UpdateMentorDto } from './dtos/update-mentor.dto';
+import { GetUser } from '../decorators/get-user.decorator';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -44,6 +47,15 @@ export class MentorController {
   @ApiOperation({ summary: 'submit mentor application' })
   submitForm(@Body() form: SubmitMentorDto) {
     return this.mentorService.submitMentor(form);
+  }
+
+  @Patch('/profile')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.MENTOR)
+  @ApiOperation({ summary: 'update mentor profile' })
+  @ApiBearerAuth()
+  updateSelfProfile(@Body() form: UpdateMentorDto, @GetUser() user: User) {
+    return this.mentorService.updateMentor(user.id, form);
   }
 
   @Get('/')
@@ -92,6 +104,15 @@ export class MentorController {
   async getMentor(@Param('id') id: string) {
     const mentor = await this.mentorService.getMentor(+id);
     return new MentorResponseDto(mentor as any);
+  }
+
+  @Patch('/:id')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Update mentor (ADMIN)' })
+  @ApiBearerAuth()
+  updateMentor(@Param('id') id: string, @Body() form: UpdateMentorDto) {
+    return this.mentorService.updateMentor(+id, form);
   }
 
   @Get('/:id/admin')

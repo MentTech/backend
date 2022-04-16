@@ -10,6 +10,7 @@ import { MentorResponseDto } from './dtos/mentor-response.dto';
 import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
 import { AverageResponseDto } from '../dtos/average-response.dto';
 import { RatingService } from '../rating/rating.service';
+import { UpdateMentorDto } from './dtos/update-mentor.dto';
 
 @Injectable()
 export class MentorService {
@@ -322,6 +323,48 @@ export class MentorService {
           },
         },
       },
+    });
+  }
+
+  async updateMentor(id: number, updateDto: UpdateMentorDto) {
+    const mentor = await this.prisma.userMentor.findFirst({
+      where: {
+        userId: id,
+      },
+      include: {
+        skills: true,
+      },
+    });
+    if (!mentor) {
+      throw new NotFoundException('Mentor not found');
+    }
+    const skills = mentor.skills.map((skill) => skill.skillId);
+    if (updateDto.skillIds) {
+      const skillToRemove = _.difference(skills, updateDto.skillIds);
+      const skillToAdd = _.difference(updateDto.skillIds, skills);
+      await this.prisma.$transaction([
+        this.prisma.skillsOnMentors.deleteMany({
+          where: {
+            skillId: {
+              in: skillToRemove,
+            },
+            mentorId: id,
+          },
+        }),
+        this.prisma.skillsOnMentors.createMany({
+          data: skillToAdd.map((skillId) => ({
+            skillId,
+            mentorId: id,
+          })),
+        }),
+      ]);
+    }
+    const dto = _.omit(updateDto, ['skillIds']);
+    return this.prisma.userMentor.update({
+      where: {
+        userId: id,
+      },
+      data: dto,
     });
   }
 }
