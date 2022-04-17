@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly config: ConfigService,
   ) {
     super({
-      secretOrKey: config.get<string>('jwt.jwtSecret'),
+      secretOrKey: config.get<string>('jwt.jwtSecretRandom'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }
