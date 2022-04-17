@@ -9,7 +9,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as basicAuth from 'express-basic-auth';
 import { PrismaClientExceptionFilter } from './filters/prisma-client-exception.filter';
-import helmet from 'helmet';
 
 const setup = (app: INestApplication) => {
   app.enableVersioning({
@@ -17,7 +16,6 @@ const setup = (app: INestApplication) => {
     defaultVersion: '1',
   });
   app.enableCors();
-  app.use(helmet());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

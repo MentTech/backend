@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { CreateUserDto } from '../users/dtos/create-user.dto';
@@ -22,6 +22,14 @@ export class AdminService {
 
   getAdmins(query: UserQueryPaginationDto) {
     return this.usersService.findAll(query, Role.ADMIN);
+  }
+
+  async getAdminById(id: number) {
+    const user = await this.usersService.findUserByIdAndRole(id, Role.ADMIN);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   updateAdmin(id: number, dto: UpdateUserDto) {

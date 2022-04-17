@@ -12,6 +12,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiFoundResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -58,6 +59,17 @@ export class AdminController {
   })
   getAdmins(@Query() query: UserQueryPaginationDto) {
     return this.adminService.getAdmins(query);
+  }
+
+  @Get('/:id')
+  @Serialize(UserDto)
+  @ApiOperation({ summary: 'get admin by id' })
+  @ApiFoundResponse({
+    description: 'The found admin',
+    type: UserDto,
+  })
+  getAdmin(@Param('id') id: string) {
+    return this.adminService.getAdminById(+id);
   }
 
   @Patch('/:id')

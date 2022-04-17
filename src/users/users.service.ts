@@ -47,6 +47,21 @@ export class UsersService {
     });
   }
 
+  findUserByIdAndRole(id: number, role: Role) {
+    return this.prisma.user.findFirst({
+      where: {
+        id,
+        role,
+      },
+    });
+  }
+
+  findUsersWithQuery(where: Prisma.UserWhereInput) {
+    return this.prisma.user.findMany({
+      where,
+    });
+  }
+
   async findAll(query: UserQueryPaginationDto, role: Role) {
     const { limit, page } = query;
     const where: Prisma.UserWhereInput = {
