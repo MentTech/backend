@@ -16,6 +16,7 @@ import { LogResponseMiddleware } from './middlewares/log-response.middleware';
 import { NotificationModule } from './notification/notification.module';
 import { MenteeModule } from './mentee/mentee.module';
 import { RatingModule } from './rating/rating.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RatingModule } from './rating/rating.module';
     NotificationModule,
     MenteeModule,
     RatingModule,
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
