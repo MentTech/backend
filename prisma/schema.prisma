@@ -12,23 +12,25 @@ datasource db {
 }
 
 model User {
-  id              Int               @id @default(autoincrement())
-  email           String            @unique
-  password        String
-  name            String?
-  role            Role              @default(MENTEE)
-  birthday        DateTime?
-  phone           String?
-  avatar          String?
-  isActive        Boolean           @default(true)
-  coin            Int               @default(0)
-  isPasswordSet   Boolean           @default(false)
-  User_mentor     UserMentor?
-  User_mentee     MenteeProfile?    @relation("mentee_profile")
-  RegisterHistory ProgramRegister[]
-  transactions    UserTransaction[]
-  onWishlist      MenteeProfile[]
-  createAt        DateTime          @default(now())
+  id                 Int               @id @default(autoincrement())
+  email              String            @unique
+  password           String
+  name               String?
+  role               Role              @default(MENTEE)
+  birthday           DateTime?
+  phone              String?
+  avatar             String?
+  isActive           Boolean           @default(true)
+  coin               Int               @default(0)
+  isPasswordSet      Boolean           @default(false)
+  User_mentor        UserMentor?
+  User_mentee        MenteeProfile?    @relation("mentee_profile")
+  RegisterHistory    ProgramRegister[]
+  transactions       UserTransaction[]
+  onWishlist         MenteeProfile[]
+  notified           Notification[]    @relation("nofify_notifier")
+  actingNotification Notification[]    @relation("nofify_actor")
+  createAt           DateTime          @default(now())
 }
 
 model UserMentor {
@@ -187,6 +189,29 @@ model MenteeProfile {
   userId          Int    @unique
   user            User   @relation(fields: [userId], references: [id], name: "mentee_profile")
   favoriteMentors User[]
+}
+
+model NotificationType {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  createAt      DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  notifications Notification[]
+}
+
+model Notification {
+  id         Int              @id @default(autoincrement())
+  typeId     Int
+  type       NotificationType @relation(fields: [typeId], references: [id])
+  actorId    Int // User that trigger the notification
+  actor      User             @relation(fields: [actorId], references: [id], name: "nofify_actor")
+  notifierId Int // User that receive the notification
+  notifier   User             @relation(fields: [notifierId], references: [id], name: "nofify_notifier")
+  message    String
+  isRead     Boolean          @default(false)
+  additional Json?
+  createAt   DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 }
 
 enum TransactionStatus {

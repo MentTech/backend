@@ -9,6 +9,7 @@ import { Role } from '@prisma/client';
 import { AcceptSessionDto } from './dto/accept-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { TransactionCoinService } from '../../../transaction/transaction-coin/transaction-coin.service';
+import { SendNotificationService } from '../../../notification/send-notification.service';
 
 @Injectable()
 export class RegisterService {
@@ -16,6 +17,7 @@ export class RegisterService {
     private readonly transactionService: TransactionService,
     private readonly transactionCoinService: TransactionCoinService,
     private readonly prisma: PrismaService,
+    private readonly sendNotificationService: SendNotificationService,
   ) {}
 
   async requestSession(menteeId: number, programId: number) {
@@ -44,10 +46,12 @@ export class RegisterService {
         );
       }
     });
-    return this.transactionCoinService.menteeRequestSession(
+    const session = await this.transactionCoinService.menteeRequestSession(
       menteeId,
       programId,
     );
+    await this.sendNotificationService.menteeRequestSession(session.id);
+    return session;
     // if (!this.transactionService.checkBalance(menteeId, program.credit)) {
     //   throw new UnprocessableEntityException('Not enough balance');
     // }
@@ -67,13 +71,15 @@ export class RegisterService {
     if (!session) {
       throw new NotFoundException('Session not found');
     }
-    return this.prisma.programRegister.update({
+    const newSession = await this.prisma.programRegister.update({
       where: { id: sessionId },
       data: {
         isAccepted: true,
         ...acceptSessionDto,
       },
     });
+    await this.sendNotificationService.mentorAcceptSession(newSession.id);
+    return newSession;
   }
 
   async rejectSession(sessionId: number, mentorId: number) {
@@ -88,7 +94,11 @@ export class RegisterService {
     if (!session) {
       throw new NotFoundException('Session not found');
     }
-    return this.transactionCoinService.mentorRefuseSession(sessionId);
+    const newSession = await this.transactionCoinService.mentorRefuseSession(
+      sessionId,
+    );
+    await this.sendNotificationService.mentorRejectSession(newSession.id);
+    return newSession;
     // if (!this.transactionService.mentorRejectSession(sessionId)) {
     //   throw new UnprocessableEntityException('Session already accepted');
     // }

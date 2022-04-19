@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { UserQueryPaginationDto } from './dtos/user-query-pagination.dto';
 import { UsersService } from './users.service';
 
 const singleUser = {
@@ -102,7 +103,10 @@ describe('UsersService', () => {
   });
 
   it('should return all users', async () => {
-    const users = await service.findAll();
+    const users = await service.findAll(
+      {} as UserQueryPaginationDto,
+      Role.MENTEE,
+    );
     expect(users).toEqual(users);
   });
 

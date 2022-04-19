@@ -1,47 +1,27 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import JwtAuthenticationGuard from '../auth/guards/jwt-authentiacation.guard';
+import { GetUser } from '../decorators/get-user.decorator';
 
 @Controller('notification')
 @ApiTags('Notification')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @Post()
-  create(@Body() createNotificationDto: CreateNotificationDto) {
-    return this.notificationService.create(createNotificationDto);
+  @Get('/')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Get all notifications' })
+  @ApiBearerAuth()
+  async getNotification(@GetUser() user) {
+    return this.notificationService.getNotification(user.id);
   }
 
-  @Get()
-  findAll() {
-    return this.notificationService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.notificationService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateNotificationDto: UpdateNotificationDto,
-  ) {
-    return this.notificationService.update(+id, updateNotificationDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.notificationService.remove(+id);
+  @Patch('/:id')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Mark notification as read' })
+  @ApiBearerAuth()
+  async markAsRead(@GetUser() user, @Param('id') id: string) {
+    return this.notificationService.setNotificationRead(+id, user.id);
   }
 }

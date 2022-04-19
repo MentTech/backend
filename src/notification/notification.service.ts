@@ -1,26 +1,47 @@
-import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class NotificationService {
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
+  constructor(private readonly prisma: PrismaService) {}
+
+  getNotification(userId: number) {
+    return this.prisma.notification.findMany({
+      where: {
+        notifierId: userId,
+      },
+      include: {
+        type: true,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all notification`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
-  }
-
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+  async setNotificationRead(notificationId: number, userId: number) {
+    const notification = await this.prisma.notification.findFirst({
+      where: {
+        id: notificationId,
+      },
+    });
+    if (!notification) {
+      throw new NotFoundException('Notification not found');
+    }
+    if (notification.notifierId !== userId) {
+      throw new ForbiddenException('Not authorized');
+    }
+    return this.prisma.notification.update({
+      where: {
+        id: notificationId,
+      },
+      data: {
+        isRead: true,
+      },
+      include: {
+        type: true,
+      },
+    });
   }
 }

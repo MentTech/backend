@@ -6,9 +6,10 @@ import { PrismaModule } from '../../../prisma/prisma.module';
 import { RegisterRatingService } from './register-rating.service';
 import { RegisterRatingController } from './register-rating.controller';
 import { RatingModule } from '../../../rating/rating.module';
+import { NotificationModule } from '../../../notification/notification.module';
 
 @Module({
-  imports: [TransactionModule, PrismaModule, RatingModule],
+  imports: [TransactionModule, PrismaModule, RatingModule, NotificationModule],
   controllers: [RegisterController, RegisterRatingController],
   providers: [RegisterService, RegisterRatingService],
 })
