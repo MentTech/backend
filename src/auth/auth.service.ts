@@ -146,4 +146,15 @@ export class AuthService {
       throw new UnauthorizedException('Please check your old password');
     }
   }
+
+  async validateJwtToken(token: string) {
+    const jwtPayload = this.jwtService.decode(token) as JwtPayload;
+    if (jwtPayload) {
+      const user = await this.usersService.findById(jwtPayload.id);
+      if (user) {
+        return user;
+      }
+    }
+    return null;
+  }
 }
