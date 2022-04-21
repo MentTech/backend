@@ -1,31 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateMenteeDto } from './dto/create-mentee.dto';
-import { UpdateMenteeDto } from './dto/update-mentee.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '@prisma/client';
+import { UsersService } from '../users/users.service';
+import { UserQueryPaginationDto } from '../users/dtos/user-query-pagination.dto';
+import { UpdateUserDto } from '../users/dtos/update-user.dto';
 
 @Injectable()
 export class MenteeService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userService: UsersService,
+  ) {}
 
-  create(createMenteeDto: CreateMenteeDto) {
-    return 'This action adds a new mentee';
-  }
-
-  findAll() {
-    return `This action returns all mentee`;
+  findAll(query: UserQueryPaginationDto) {
+    return this.userService.findAll(query, Role.MENTEE);
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} mentee`;
+    return this.userService.findUserByIdAndRole(id, Role.MENTEE);
   }
 
-  update(id: number, updateMenteeDto: UpdateMenteeDto) {
-    return `This action updates a #${id} mentee`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} mentee`;
+  update(id: number, updateMenteeDto: UpdateUserDto) {
+    return this.userService.changeProfile(id, updateMenteeDto);
   }
 
   getMySession(id: number) {
