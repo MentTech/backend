@@ -34,6 +34,15 @@ export class TransactionController {
     return this.transactionService.getTransactions(user.id);
   }
 
+  @Get('/card')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Get all gift cards (ADMIN)' })
+  @ApiBearerAuth()
+  getAllGiftCard() {
+    return this.transactionService.getAllGiftCard();
+  }
+
   @Post('/card')
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.ADMIN)

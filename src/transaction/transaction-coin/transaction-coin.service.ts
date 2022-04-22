@@ -230,6 +230,10 @@ export class TransactionCoinService {
     });
   }
 
+  getAllGiftCard(): Promise<GiftCode[]> {
+    return this.prisma.giftCode.findMany();
+  }
+
   async applyGiftCard(userId: number, code: string) {
     const card = await this.prisma.giftCode.findFirst({
       where: {
