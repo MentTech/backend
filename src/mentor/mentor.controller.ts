@@ -33,6 +33,7 @@ import { AverageResponseDto } from '../dtos/average-response.dto';
 import { SuggestQueryDto } from './dtos/suggest-query.dto';
 import { UpdateMentorDto } from './dtos/update-mentor.dto';
 import { GetUser } from '../decorators/get-user.decorator';
+import * as _ from 'lodash';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -127,7 +128,7 @@ export class MentorController {
   @ApiBearerAuth()
   async getMentorAdmin(@Param('id') id: string) {
     const mentor = await this.mentorService.getMentor(+id, false);
-    return new MentorResponseDto(mentor as any);
+    return _.omit(mentor, ['password']);
   }
 
   @Get('/:id/rating')
