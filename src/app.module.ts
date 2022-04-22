@@ -5,8 +5,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import authConfig from '../config/auth.config';
-import commonConfig from '../config/common.config';
+import authConfig from './config/auth.config';
+import commonConfig from './config/common.config';
+import mailConfig from './config/mail.config';
 import { MentorModule } from './mentor/mentor.module';
 import { AdminModule } from './admin/admin.module';
 import { SkillModule } from './skill/skill.module';
@@ -17,6 +18,7 @@ import { NotificationModule } from './notification/notification.module';
 import { MenteeModule } from './mentee/mentee.module';
 import { RatingModule } from './rating/rating.module';
 import { SocketModule } from './socket/socket.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { SocketModule } from './socket/socket.module';
     PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [authConfig, commonConfig],
+      load: [authConfig, commonConfig, mailConfig],
     }),
     MentorModule,
     AdminModule,
@@ -36,6 +38,7 @@ import { SocketModule } from './socket/socket.module';
     MenteeModule,
     RatingModule,
     SocketModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

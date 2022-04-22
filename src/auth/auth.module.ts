@@ -9,9 +9,11 @@ import { JwtStrategy } from './jwt.strategy';
 import { GoogleStrategy } from './google.strategy';
 import { BcryptService } from './bcrypt.service';
 import { HttpModule } from '@nestjs/axios';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
+    MailModule,
     HttpModule,
     forwardRef(() => UsersModule),
     PassportModule.register({

@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import {
   ConflictException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -13,14 +14,18 @@ import { UsersService } from '../users/users.service';
 import { BcryptService } from './bcrypt.service';
 import { CredentialDto } from './dtos/credential.dto';
 import { JwtPayload } from './dtos/jwt-payload.dto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger('AuthService');
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly bcryptService: BcryptService,
     private readonly httpService: HttpService,
+    private readonly mailService: MailService,
   ) {}
 
   async createHashedPassword(password: string) {
@@ -36,12 +41,15 @@ export class AuthService {
       password: hashedPassword,
     };
     try {
-      return await this.usersService.createUser(
+      const user = await this.usersService.createUser(
         newUser,
         Role.MENTEE,
         isPasswordSet,
       );
+      await this.mailService.sendUserConfirmationEmail(user, 'token');
+      return user;
     } catch (err) {
+      this.logger.error(err);
       throw new ConflictException('email already exists');
     }
   }
