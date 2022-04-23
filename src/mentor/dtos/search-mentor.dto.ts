@@ -10,7 +10,7 @@ export enum SortOrder {
 
 export enum SortBy {
   NAME = 'name',
-  RATING = 'rating',
+  CREATEAT = 'createAt',
 }
 
 export class SearchMentorDto implements PaginationSortDto {

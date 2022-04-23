@@ -12,7 +12,7 @@ export class MailService {
 
   async sendUserConfirmationEmail(user: User, token: string) {
     const web = this.config.get<string>('url.web');
-    const url = `${web}/${token}`;
+    const url = `${web}/activation/${token}`;
     await this.mailerService.sendMail({
       to: user.email,
       subject: 'Confirm your email',

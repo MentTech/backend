@@ -19,6 +19,7 @@ import { MenteeModule } from './mentee/mentee.module';
 import { RatingModule } from './rating/rating.module';
 import { SocketModule } from './socket/socket.module';
 import { MailModule } from './mail/mail.module';
+import { ActivationModule } from './activation/activation.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { MailModule } from './mail/mail.module';
     RatingModule,
     SocketModule,
     MailModule,
+    ActivationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

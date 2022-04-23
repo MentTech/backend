@@ -20,7 +20,7 @@ model User {
   birthday           DateTime?
   phone              String?
   avatar             String?
-  isActive           Boolean           @default(true)
+  isActive           Boolean           @default(false)
   coin               Int               @default(0)
   isPasswordSet      Boolean           @default(false)
   User_mentor        UserMentor?
@@ -30,6 +30,7 @@ model User {
   onWishlist         MenteeProfile[]
   notified           Notification[]    @relation("nofify_notifier")
   actingNotification Notification[]    @relation("nofify_actor")
+  activeCode         ActivationCode[]
   createAt           DateTime          @default(now())
 }
 
@@ -212,6 +213,16 @@ model Notification {
   additional Json?
   createAt   DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
+}
+
+model ActivationCode {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  userId    Int
+  isUsed    Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
+  expiredIn Int      @default(3600)
+  createAt  DateTime @default(now())
 }
 
 enum TransactionStatus {

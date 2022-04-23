@@ -14,7 +14,7 @@ import { UsersService } from '../users/users.service';
 import { BcryptService } from './bcrypt.service';
 import { CredentialDto } from './dtos/credential.dto';
 import { JwtPayload } from './dtos/jwt-payload.dto';
-import { MailService } from '../mail/mail.service';
+import { ActivationService } from '../activation/activation.service';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +25,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly bcryptService: BcryptService,
     private readonly httpService: HttpService,
-    private readonly mailService: MailService,
+    private readonly activationService: ActivationService,
   ) {}
 
   async createHashedPassword(password: string) {
@@ -46,7 +46,7 @@ export class AuthService {
         Role.MENTEE,
         isPasswordSet,
       );
-      await this.mailService.sendUserConfirmationEmail(user, 'token');
+      await this.activationService.sendActivationEmail(user);
       return user;
     } catch (err) {
       this.logger.error(err);
