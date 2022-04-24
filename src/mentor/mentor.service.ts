@@ -46,11 +46,6 @@ export class MentorService {
             category: {
               connect: { id: form.categoryId },
             },
-            jobs: {
-              createMany: {
-                data: form.jobs,
-              },
-            },
             skills: {
               create: form.skillIds.map((skillId) => ({
                 skill: { connect: { id: skillId } },

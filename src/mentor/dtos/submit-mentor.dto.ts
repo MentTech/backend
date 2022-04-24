@@ -10,7 +10,8 @@ import {
 } from 'class-validator';
 import { CreateDegreeDto } from '../degree/dto/create-degree.dto';
 import { CreateExperienceDto } from '../experience/dto/create-experience.dto';
-import { JobDto } from './job.dtos';
+
+//import { JobDto } from './job.dtos';
 
 export class SubmitMentorDto {
   @IsEmail()
@@ -69,12 +70,12 @@ export class SubmitMentorDto {
   })
   linkedin?: string;
 
-  @ValidateNested({ each: true })
-  @Type(() => JobDto)
-  @ApiProperty({
-    type: [JobDto],
-  })
-  jobs: JobDto[];
+  // @ValidateNested({ each: true })
+  // @Type(() => JobDto)
+  // @ApiProperty({
+  //   type: [JobDto],
+  // })
+  // jobs: JobDto[];
 
   @IsString({ each: true })
   @ApiProperty({
