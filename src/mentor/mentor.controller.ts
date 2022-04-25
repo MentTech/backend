@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -7,11 +8,13 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -25,7 +28,6 @@ import { AcceptMentorDto } from './dtos/accept-mentor.dto';
 import { MentorQueryDto } from './dtos/mentor-query.dto';
 import { MentorResponseDto } from './dtos/mentor-response.dto';
 import { SearchMentorDto } from './dtos/search-mentor.dto';
-import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import { MentorService } from './mentor.service';
 import { PaginationResponseDto } from '../dtos/pagination-response.dto';
 import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
@@ -34,6 +36,13 @@ import { SuggestQueryDto } from './dtos/suggest-query.dto';
 import { UpdateMentorDto } from './dtos/update-mentor.dto';
 import { GetUser } from '../decorators/get-user.decorator';
 import * as _ from 'lodash';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import {
+  avatarFileFilter,
+  editAvatarFileName,
+} from '../multer-utils/avatar.multer';
+import { SubmitMentorWoAvatarDto } from './dtos/submit-mentor-wo-avatar.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -41,13 +50,35 @@ export class MentorController {
   constructor(private readonly mentorService: MentorService) {}
 
   @Post('/apply')
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      limits: {
+        fileSize: 10 * 1024 * 1024,
+      },
+      storage: diskStorage({
+        destination: './uploads/avatars',
+        filename: editAvatarFileName,
+      }),
+      fileFilter: avatarFileFilter,
+    }),
+  )
   @ApiResponse({
     status: 201,
     description: 'Form submitted',
   })
-  @ApiOperation({ summary: 'submit mentor application' })
-  submitForm(@Body() form: SubmitMentorDto) {
-    return this.mentorService.submitMentor(form);
+  @ApiOperation({ summary: 'submit mentor application (add avatar to body)' })
+  @ApiConsumes('multipart/form-data')
+  submitForm(
+    @Body() form: SubmitMentorWoAvatarDto,
+    @UploadedFile() avatar: Express.Multer.File,
+  ) {
+    if (!avatar) {
+      throw new BadRequestException('Avatar is required');
+    }
+    return this.mentorService.submitMentor({
+      ...form,
+      avatar: `/avatars/${avatar.fieldname}`,
+    });
   }
 
   @Patch('/profile')

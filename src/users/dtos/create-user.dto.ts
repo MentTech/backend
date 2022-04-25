@@ -42,11 +42,4 @@ export class CreateUserDto {
     example: '012345678',
   })
   phone?: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiPropertyOptional({
-    example: 'avatar.png',
-  })
-  avatar?: string;
 }

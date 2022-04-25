@@ -126,7 +126,6 @@ export class AuthService {
           email: email,
           password: randomBytes(16).toString('hex'),
           name: name,
-          avatar,
         },
         false,
       );

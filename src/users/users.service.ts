@@ -13,13 +13,12 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   createUser(user: CreateUserDto, role: Role, isPasswordSet: boolean) {
-    if (!user.avatar) {
-      let hashedEmail = user.email.trim().toLowerCase();
-      createHash('md5').update(hashedEmail).digest('hex');
-      user.avatar = `https://www.gravatar.com/avatar/${hashedEmail}?s=200`;
-    }
+    let email = user.email.trim().toLowerCase();
+    const hash = createHash('md5').update(email).digest('hex');
+    const avatar = `https://www.gravatar.com/avatar/${hash}?s=200`;
     const userCreate: Prisma.UserCreateInput = {
       ...user,
+      avatar,
       role,
       isPasswordSet,
     };
