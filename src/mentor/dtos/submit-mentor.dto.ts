@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUrl,
   ValidateNested,
 } from 'class-validator';
 import { CreateDegreeDto } from '../degree/dto/create-degree.dto';
@@ -39,7 +40,7 @@ export class SubmitMentorDto {
   })
   phone: string;
 
-  @IsString()
+  @IsUrl()
   @ApiProperty({
     example: 'avatar.png',
   })

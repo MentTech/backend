@@ -1,18 +1,6 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
   ApiHeader,
   ApiOperation,
   ApiResponse,
@@ -26,13 +14,8 @@ import { Serialize } from '../interceptors/serialize.interceptor';
 import { UsersService } from './users.service';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import {
-  avatarFileFilter,
-  editAvatarFileName,
-} from '../multer-utils/avatar.multer';
 import { UpdateUserWoAvatarDto } from './dtos/update-user-wo-avatar.dto';
+import { ChangeAvatarDto } from './dtos/change-avatar.dto';
 
 @Controller('users')
 @ApiTags('User')
@@ -69,42 +52,24 @@ export class UsersController {
   }
 
   @Patch('/avatar')
-  @UseInterceptors(
-    FileInterceptor('avatar', {
-      limits: {
-        fileSize: 10 * 1024 * 1024,
-      },
-      storage: diskStorage({
-        destination: './uploads/avatars',
-        filename: editAvatarFileName,
-      }),
-      fileFilter: avatarFileFilter,
-    }),
-  )
+  // @UseInterceptors(
+  //   FileInterceptor('avatar', {
+  //     limits: {
+  //       fileSize: 10 * 1024 * 1024,
+  //     },
+  //     storage: diskStorage({
+  //       destination: './uploads/avatars',
+  //       filename: editAvatarFileName,
+  //     }),
+  //     fileFilter: avatarFileFilter,
+  //   }),
+  // )
   @UseGuards(JwtAuthenticationGuard)
   @ApiOperation({ summary: 'Change user avatar' })
   @ApiBearerAuth()
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        avatar: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  async changeAvatar(
-    @GetUser() user: User,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    if (!file) {
-      throw new BadRequestException('No avatar uploaded');
-    }
+  async changeAvatar(@GetUser() user: User, @Body() body: ChangeAvatarDto) {
     await this.usersService.changeProfile(user.id, {
-      avatar: `/avatars/${file.filename}`,
+      avatar: body.avatar,
     });
     return {
       message: 'Avatar changed',
