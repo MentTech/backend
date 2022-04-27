@@ -30,12 +30,6 @@ const form: SubmitMentorDto = {
     },
   ],
   categoryId: 1,
-  jobs: [
-    {
-      position: 'title',
-      company: 'company',
-    },
-  ],
   skillIds: [1],
   achievements: ['achievement'],
   introduction: 'introduction',

@@ -1,14 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsDateString,
-  IsEmail,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUrl,
-  ValidateNested,
-} from 'class-validator';
+import { IsDateString, IsEmail, IsNumber, IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
 import { CreateDegreeDto } from '../degree/dto/create-degree.dto';
 import { CreateExperienceDto } from '../experience/dto/create-experience.dto';
 
