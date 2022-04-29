@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, Role, User } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -58,6 +62,8 @@ export class MentorService {
             },
             isAccepted: false,
             introduction: form.introduction,
+            cv: form.cv,
+            linkedin: form.linkedin,
           },
         },
       },
@@ -251,6 +257,50 @@ export class MentorService {
       count,
       average: avg._avg.rating,
     });
+  }
+
+  async changeFeaturedRatings(mentorId: number, ids: number[]) {
+    if (ids.length > 5) {
+      throw new BadRequestException('Maximum featured rating is 5');
+    }
+    const byMentor = await this.prisma.rating.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        register: {
+          program: {
+            mentorId,
+          },
+        },
+      },
+    });
+    if (byMentor.length !== ids.length) {
+      throw new BadRequestException('Rating not found or not belong to you');
+    }
+    await this.prisma.userMentor.update({
+      where: {
+        userId: mentorId,
+      },
+      data: {
+        featuredRatings: ids,
+      },
+    });
+    return {
+      message: 'Featured ratings updated',
+    };
+  }
+
+  async getFeaturedRatings(mentorId: number) {
+    const mentor = await this.prisma.userMentor.findFirst({
+      where: {
+        userId: mentorId,
+      },
+    });
+    if (!mentor) {
+      throw new NotFoundException('Mentor not found');
+    }
+    return this.ratingService.getMultipleRating(mentor.featuredRatings);
   }
 
   async suggestMentors(mentorId: number, num: number = 5) {
