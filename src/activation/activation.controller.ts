@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
 import { ActivationService } from './activation.service';
 import { ResendActiveEmailDto } from './dto/resend-active-email.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -14,7 +14,7 @@ export class ActivationController {
     return this.activationService.resendActivationEmail(body.email);
   }
 
-  @Get('/:token')
+  @Post('/:token')
   @ApiOperation({ summary: 'Activate user' })
   activateAccount(@Param('token') token: string) {
     return this.activationService.activateAccount(token);
