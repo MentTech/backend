@@ -57,6 +57,15 @@ export class ActivationService {
     return this.sendActivationEmail(user);
   }
 
+  async isUserActivated(userId: number): Promise<boolean> {
+    const codes = await this.prisma.activationCode.findMany({
+      where: {
+        userId,
+      },
+    });
+    return codes.some((code) => code.isUsed);
+  }
+
   async activateAccount(token: string) {
     const activationCode = await this.prisma.activationCode.findFirst({
       where: {

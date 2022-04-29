@@ -72,9 +72,16 @@ export class AuthService {
     if (
       user &&
       (await this.bcryptService.compare(password, user.password)) &&
-      user.role === role &&
-      user.isActive
+      user.role === role
     ) {
+      if (!user.isActive) {
+        if (!(await this.activationService.isUserActivated(user.id))) {
+          throw new UnauthorizedException(
+            'You have not activated your account',
+          );
+        }
+        throw new UnauthorizedException('Your account has been deactivated');
+      }
       const payload: JwtPayload = { id: user.id };
       const accessToken = this.jwtService.sign(payload);
       return { accessToken };
