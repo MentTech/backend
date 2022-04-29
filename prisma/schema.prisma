@@ -35,21 +35,23 @@ model User {
 }
 
 model UserMentor {
-  userId       Int               @id
-  User         User              @relation(fields: [userId], references: [id])
-  degree       Degree[]
-  experiences  Experience[]
-  linkedin     String?
-  jobs         Job[]
-  achievements Achievement[]
-  skills       SkillsOnMentors[]
-  programs     Program[]
-  categoryId   Int
-  category     Category          @relation(fields: [categoryId], references: [id])
-  introduction String
-  rating       Decimal           @default(0)
-  isAccepted   Boolean           @default(false)
-  createAt     DateTime          @default(now())
+  userId          Int               @id
+  User            User              @relation(fields: [userId], references: [id])
+  degree          Degree[]
+  experiences     Experience[]
+  linkedin        String?
+  jobs            Job[]
+  achievements    Achievement[]
+  skills          SkillsOnMentors[]
+  programs        Program[]
+  categoryId      Int
+  category        Category          @relation(fields: [categoryId], references: [id])
+  introduction    String
+  cv              String?
+  featuredRatings Int[]
+  rating          Decimal           @default(0)
+  isAccepted      Boolean           @default(false)
+  createAt        DateTime          @default(now())
 }
 
 model Experience {

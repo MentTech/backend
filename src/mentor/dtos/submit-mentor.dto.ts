@@ -93,4 +93,11 @@ export class SubmitMentorDto {
     example: 'Hello',
   })
   introduction: string;
+
+  @IsUrl()
+  @IsOptional()
+  @ApiPropertyOptional({
+    example: 'https://example.com',
+  })
+  cv?: string;
 }

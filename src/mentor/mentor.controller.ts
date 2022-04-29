@@ -34,6 +34,7 @@ import { UpdateMentorDto } from './dtos/update-mentor.dto';
 import { GetUser } from '../decorators/get-user.decorator';
 import * as _ from 'lodash';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
+import { GetRatingsQueryDto } from '../rating/dto/get-ratings-query.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -149,6 +150,24 @@ export class MentorController {
   })
   getAverageRating(@Param('id') id: string) {
     return this.mentorService.averageRating(+id);
+  }
+
+  @Get('/:id/rating/feature')
+  @ApiOperation({ summary: 'Get mentor feature rating' })
+  getFeatureRating(@Param('id') id: string) {
+    return this.mentorService.getFeaturedRatings(+id);
+  }
+
+  @Patch('/:id/rating/feature')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.MENTOR)
+  @ApiOperation({ summary: 'Update mentor feature rating (Maximum 5 ratings)' })
+  @ApiBearerAuth()
+  updateFeatureRating(
+    @Param('id') id: string,
+    @Body() form: GetRatingsQueryDto,
+  ) {
+    return this.mentorService.changeFeaturedRatings(+id, form.ids);
   }
 
   @Get('/:id/suggest')
