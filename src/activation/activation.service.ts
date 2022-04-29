@@ -82,7 +82,7 @@ export class ActivationService {
     const expirationDate = new Date(
       activationCode.createAt.getTime() + 1000 * activationCode.expiredIn,
     );
-    if (expirationDate > now) {
+    if (now > expirationDate) {
       throw new GoneException('Activation code is expired');
     }
     await this.prisma.$transaction([
