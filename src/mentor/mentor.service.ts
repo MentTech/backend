@@ -157,7 +157,7 @@ export class MentorService {
       include: {
         User_mentor: {
           include: {
-            programs: true,
+            //programs: true,
             category: true,
             skills: {
               include: {

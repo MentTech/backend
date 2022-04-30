@@ -29,7 +29,8 @@ export class MentorResponseDto {
     example: '1',
   })
   id: number;
-
+  @Exclude()
+  isPasswordSet: boolean;
   @ApiProperty({
     example: 'John',
   })
