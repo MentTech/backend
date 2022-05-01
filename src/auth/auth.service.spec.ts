@@ -7,6 +7,7 @@ import { of, throwError } from 'rxjs';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { BcryptService } from './bcrypt.service';
+import { ActivationService } from '../activation/activation.service';
 
 const user = {
   id: 1,
@@ -22,11 +23,17 @@ const user = {
   phone: '123',
 };
 
+const mockActivationService = {
+  sendActivationEmail: jest.fn(),
+};
+
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: UsersService;
   let bcryptService: BcryptService;
   let httpService: HttpService;
+  let activationService: ActivationService;
+  let jwtService: JwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,6 +52,9 @@ describe('AuthService', () => {
           provide: JwtService,
           useValue: {
             sign: jest.fn().mockReturnValue('token'),
+            decode: jest.fn().mockReturnValue({
+              id: 1,
+            }),
           },
         },
         {
@@ -64,6 +74,10 @@ describe('AuthService', () => {
               ),
           },
         },
+        {
+          provide: ActivationService,
+          useValue: mockActivationService,
+        },
       ],
     }).compile();
 
@@ -71,6 +85,8 @@ describe('AuthService', () => {
     usersService = module.get<UsersService>(UsersService);
     bcryptService = module.get<BcryptService>(BcryptService);
     httpService = module.get<HttpService>(HttpService);
+    activationService = module.get<ActivationService>(ActivationService);
+    jwtService = module.get<JwtService>(JwtService);
   });
 
   it('should be defined', () => {
@@ -265,6 +281,19 @@ describe('AuthService', () => {
       await expect(service.setPassword(user.id, 'password')).rejects.toThrow(
         ConflictException,
       );
+    });
+  });
+
+  describe('validateJwtToken', () => {
+    it('should return user if token is valid', async () => {
+      const u = await service.validateJwtToken('123123123123123');
+      expect(u).toEqual(user);
+    });
+
+    it('should throw error if token is invalid', async () => {
+      jest.spyOn(jwtService, 'decode').mockReturnValue(null);
+      const ret = await service.validateJwtToken('123123123123123');
+      expect(ret).toEqual(null);
     });
   });
 });

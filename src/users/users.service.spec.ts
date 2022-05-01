@@ -1,9 +1,10 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserQueryPaginationDto } from './dtos/user-query-pagination.dto';
 import { UsersService } from './users.service';
+import * as _ from 'lodash';
 
 const singleUser = {
   id: 1,
@@ -11,6 +12,7 @@ const singleUser = {
   password: 'test',
   name: 'test',
   role: Role.MENTEE,
+  isActive: true,
 };
 
 const users = [
@@ -43,6 +45,7 @@ const db = {
     findUnique: jest.fn().mockResolvedValue(singleUser),
     findMany: jest.fn().mockResolvedValue(users),
     update: jest.fn().mockResolvedValue(users[1]),
+    count: jest.fn().mockResolvedValue(users.length),
   },
 };
 
@@ -103,11 +106,16 @@ describe('UsersService', () => {
   });
 
   it('should return all users', async () => {
-    const users = await service.findAll(
-      {} as UserQueryPaginationDto,
+    const retUsers = await service.findAll(
+      { limit: 10, page: 1 } as UserQueryPaginationDto,
       Role.MENTEE,
     );
-    expect(users).toEqual(users);
+    expect(retUsers).toEqual({
+      totalPage: Math.ceil(users.length / 10),
+      data: users.map((user) => _.omit(user, ['password'])),
+      limit: 10,
+      page: 1,
+    });
   });
 
   it('should return user with match email', async () => {
@@ -126,5 +134,13 @@ describe('UsersService', () => {
   it('should change user password', async () => {
     const user = await service.changePassword(1, 'test1');
     expect(user).toEqual(users[1]);
+  });
+
+  it('should lock user', async () => {
+    const cloneUser = _.cloneDeep(singleUser);
+    cloneUser.isActive = false;
+    jest.spyOn(prisma.user, 'update').mockResolvedValue(cloneUser as User);
+    const user = await service.lockUser(1);
+    expect(user.isActive).toEqual(false);
   });
 });

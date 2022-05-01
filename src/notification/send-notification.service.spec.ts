@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SendNotificationService } from './send-notification.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { SocketNotificationService } from '../socket/socket-notification.service';
 
 const mockPrismaService = {};
 
@@ -13,6 +14,10 @@ describe('SendNotificationService', () => {
         SendNotificationService,
         {
           provide: PrismaService,
+          useValue: mockPrismaService,
+        },
+        {
+          provide: SocketNotificationService,
           useValue: mockPrismaService,
         },
       ],

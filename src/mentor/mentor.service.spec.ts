@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Role } from '@prisma/client';
 import { AuthService } from '../auth/auth.service';
@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import { MentorService } from './mentor.service';
 import { SortOrder } from './dtos/search-mentor.dto';
+import { RatingService } from '../rating/rating.service';
 
 const form: SubmitMentorDto = {
   email: 'test@email.com',
@@ -73,17 +74,37 @@ const mockPrismaService = {
   rating: {
     count: jest.fn().mockResolvedValue(10),
     findMany: jest.fn().mockResolvedValue([singleRating]),
+    aggregate: jest.fn().mockResolvedValue({
+      _avg: {
+        rating: 5,
+      },
+    }),
+  },
+  userMentor: {
+    update: jest.fn().mockResolvedValue(mentorR),
+    findFirst: jest.fn().mockResolvedValue(mentorR),
   },
 };
 const mockAuthService = {
   createHashedPassword: jest.fn().mockResolvedValue('hashedPassword'),
 };
 
+const mockRatingService = {
+  getRatingsPagination: jest.fn().mockResolvedValue({
+    page: 1,
+    totalPage: 1,
+    limit: 10,
+    data: [singleRating],
+  }),
+  getMultipleRating: jest.fn().mockResolvedValue([singleRating]),
+};
+
 describe('MentorService', () => {
   let service: MentorService;
   let prisma: PrismaService;
+  let ratingService: RatingService;
 
-  beforeEach(async () => {
+  const before = async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MentorService,
@@ -95,18 +116,25 @@ describe('MentorService', () => {
           provide: AuthService,
           useValue: mockAuthService,
         },
+        {
+          provide: RatingService,
+          useValue: mockRatingService,
+        },
       ],
     }).compile();
 
     service = module.get<MentorService>(MentorService);
     prisma = module.get<PrismaService>(PrismaService);
-  });
+    ratingService = module.get<RatingService>(RatingService);
+  };
+
+  beforeEach(before);
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should submit mentor applicatio form', async () => {
+  it('should submit mentor application form', async () => {
     const success = await service.submitMentor(form);
     expect(success).toEqual('Form submitted');
     expect(prisma.user.create).toBeCalled();
@@ -163,6 +191,54 @@ describe('MentorService', () => {
       limit: 10,
       data: [singleRating],
     });
-    expect(prisma.rating.count).toBeCalled();
+  });
+
+  it('should return average rating', async () => {
+    const averageRating = await service.averageRating(1);
+    expect(averageRating.count).toEqual(10);
+    expect(averageRating.average).toEqual(5);
+  });
+
+  describe('changeFeaturedRatings', () => {
+    beforeEach(before);
+
+    it('should change featured ratings', async () => {
+      const result = await service.changeFeaturedRatings(1, [1]);
+      expect(result).toEqual({
+        message: 'Featured ratings updated',
+      });
+      expect(prisma.user.update).toBeCalled();
+    });
+
+    it('should throw error if maximum rating is exceeded', async () => {
+      await expect(
+        service.changeFeaturedRatings(1, [1, 2, 3, 4, 5, 6]),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw error if rating is invalid', async () => {
+      await expect(service.changeFeaturedRatings(1, [1, 2])).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+  });
+
+  describe('getFeaturedRatings', () => {
+    beforeEach(before);
+
+    it('should get featured ratings', async () => {
+      const result = await service.getFeaturedRatings(1);
+      expect(result).toEqual([singleRating]);
+      expect(prisma.user.findFirst).toBeCalled();
+      expect(ratingService.getMultipleRating).toBeCalled();
+    });
+
+    it('should throw error if mentor is not exist', async () => {
+      prisma.userMentor.findFirst = jest.fn().mockResolvedValue(null);
+      await expect(service.getFeaturedRatings(1)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(prisma.user.findFirst).toBeCalled();
+    });
   });
 });

@@ -2,10 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RegisterService } from './register.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { TransactionService } from '../../../transaction/transaction.service';
-import {
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
+import { TransactionCoinService } from '../../../transaction/transaction-coin/transaction-coin.service';
+import { SendNotificationService } from '../../../notification/send-notification.service';
 
 const singleProgram = {
   id: 1,
@@ -27,6 +26,8 @@ describe('RegisterService', () => {
   let service: RegisterService;
   let prisma: PrismaService;
   let transaction: TransactionService;
+  let transactionCoinService: TransactionCoinService;
+  let sendNotificationService: SendNotificationService;
 
   const _beforeEach = async () => {
     const mockPrismaService = {
@@ -51,6 +52,15 @@ describe('RegisterService', () => {
       mentorRejectSession: jest.fn().mockResolvedValue(true),
       menteeRemoveSession: jest.fn().mockResolvedValue(true),
     };
+    const mockTransactionCoinService = {
+      menteeRequestSession: jest.fn().mockResolvedValue(singleSession),
+      mentorRefuseSession: jest.fn().mockResolvedValue(singleSession),
+    };
+    const mockSendNotificationService = {
+      menteeRequestSession: jest.fn().mockResolvedValue(true),
+      mentorAcceptSession: jest.fn().mockResolvedValue(true),
+      mentorRejectSession: jest.fn().mockResolvedValue(true),
+    };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RegisterService,
@@ -62,12 +72,26 @@ describe('RegisterService', () => {
           provide: TransactionService,
           useValue: mockTransactionService,
         },
+        {
+          provide: TransactionCoinService,
+          useValue: mockTransactionCoinService,
+        },
+        {
+          provide: SendNotificationService,
+          useValue: mockSendNotificationService,
+        },
       ],
     }).compile();
 
     service = module.get<RegisterService>(RegisterService);
     prisma = module.get<PrismaService>(PrismaService);
     transaction = module.get<TransactionService>(TransactionService);
+    transactionCoinService = module.get<TransactionCoinService>(
+      TransactionCoinService,
+    );
+    sendNotificationService = module.get<SendNotificationService>(
+      SendNotificationService,
+    );
   };
 
   beforeEach(_beforeEach);
@@ -96,13 +120,6 @@ describe('RegisterService', () => {
         NotFoundException,
       );
     });
-
-    it('should throw error if balance is not enough', async () => {
-      jest.spyOn(transaction, 'checkBalance').mockReturnValue(false);
-      await expect(service.requestSession(1, 1)).rejects.toThrow(
-        UnprocessableEntityException,
-      );
-    });
   });
 
   describe('acceptSession', () => {
@@ -126,16 +143,6 @@ describe('RegisterService', () => {
         }),
       ).rejects.toThrowError(NotFoundException);
     });
-
-    it('should throw error if transaction failed', async () => {
-      jest.spyOn(transaction, 'mentorAcceptSession').mockReturnValue(false);
-      await expect(
-        service.acceptSession(1, {
-          contactInfo: 'asd',
-          expectedDate: new Date(),
-        }),
-      ).rejects.toThrowError(UnprocessableEntityException);
-    });
   });
 
   describe('rejectSession', () => {
@@ -143,7 +150,6 @@ describe('RegisterService', () => {
     it('should reject session', async () => {
       const result = await service.rejectSession(1, 1);
       expect(prisma.programRegister.findFirst).toBeCalled();
-      expect(prisma.programRegister.update).toBeCalled();
       expect(result).toEqual(singleSession);
     });
 
@@ -151,13 +157,6 @@ describe('RegisterService', () => {
       prisma.programRegister.findFirst = jest.fn().mockResolvedValue(null);
       await expect(service.rejectSession(1, 1)).rejects.toThrowError(
         NotFoundException,
-      );
-    });
-
-    it('should throw error if transaction failed', async () => {
-      jest.spyOn(transaction, 'mentorRejectSession').mockReturnValue(false);
-      await expect(service.rejectSession(1, 1)).rejects.toThrowError(
-        UnprocessableEntityException,
       );
     });
   });
@@ -200,7 +199,6 @@ describe('RegisterService', () => {
     it('should remove session', async () => {
       const result = await service.menteeRemoveSession(1, 1);
       expect(prisma.programRegister.findFirst).toBeCalled();
-      expect(prisma.programRegister.delete).toBeCalled();
       expect(result).toEqual(singleSession);
     });
   });

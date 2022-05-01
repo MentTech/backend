@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProgramService } from './program.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { RatingService } from '../../rating/rating.service';
 
 const singleProgram = {
   id: 1,
@@ -29,9 +30,12 @@ const mockPrismaService = {
   },
 };
 
+const mockRatingService = {};
+
 describe('ProgramService', () => {
   let service: ProgramService;
   let prisma: PrismaService;
+  let ratingService: RatingService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,11 +45,16 @@ describe('ProgramService', () => {
           provide: PrismaService,
           useValue: mockPrismaService,
         },
+        {
+          provide: RatingService,
+          useValue: mockRatingService,
+        },
       ],
     }).compile();
 
     service = module.get<ProgramService>(ProgramService);
     prisma = module.get<PrismaService>(PrismaService);
+    ratingService = module.get<RatingService>(RatingService);
   });
 
   it('should be defined', () => {

@@ -33,8 +33,9 @@ MAIL_USERNAME=<email_username>
 MAIL_PASSWORD=<email_password>
 MAIL_FROM=<from_email>
 FRONT_END_URL=<front_end_url>
-```
 PORT=8080
+```
+
 ```
 
 ## Running the app
