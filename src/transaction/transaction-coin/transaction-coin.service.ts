@@ -63,41 +63,38 @@ export class TransactionCoinService {
       throw new UnprocessableEntityException('Not enough coin');
     }
     const uniqueId = nanoid();
-    this.prisma.$transaction([
-      this.prisma.userTransaction.create({
-        data: {
-          relatedId: uniqueId,
-          userId: menteeId,
-          amount: -program.credit,
-          type: TransactionType.APPLY,
-          status: TransactionStatus.HOLD,
-          message: 'Apply for session',
-        },
-      }),
-      this.prisma.userTransaction.create({
-        data: {
-          relatedId: uniqueId,
-          userId: program.mentorId,
-          amount: program.credit,
-          type: TransactionType.RECEIVE,
-          status: TransactionStatus.PENDING,
-          message: `${menteeId} apply for session`,
-        },
-      }),
-      this.prisma.programRegister.create({
-        data: {
-          user: { connect: { id: menteeId } },
-          program: { connect: { id: programId } },
-          relatedId: uniqueId,
-        },
-      }),
-    ]);
+    const [menteeTransaction, mentorTransaction, sessionRegister] =
+      await this.prisma.$transaction([
+        this.prisma.userTransaction.create({
+          data: {
+            relatedId: uniqueId,
+            userId: menteeId,
+            amount: -program.credit,
+            type: TransactionType.APPLY,
+            status: TransactionStatus.HOLD,
+            message: 'Apply for session',
+          },
+        }),
+        this.prisma.userTransaction.create({
+          data: {
+            relatedId: uniqueId,
+            userId: program.mentorId,
+            amount: program.credit,
+            type: TransactionType.RECEIVE,
+            status: TransactionStatus.PENDING,
+            message: `${menteeId} apply for session`,
+          },
+        }),
+        this.prisma.programRegister.create({
+          data: {
+            user: { connect: { id: menteeId } },
+            program: { connect: { id: programId } },
+            relatedId: uniqueId,
+          },
+        }),
+      ]);
     await this.calculateBalance(menteeId);
-    return this.prisma.programRegister.findFirst({
-      where: {
-        relatedId: uniqueId,
-      },
-    });
+    return sessionRegister;
   }
 
   async findSessions(sessionId: number) {
@@ -173,38 +170,35 @@ export class TransactionCoinService {
   async mentorRefuseSession(sessionId: number) {
     const transactions = await this.findSessions(sessionId);
     const { mentor, mentee } = transactions;
-    await this.prisma.$transaction([
-      this.prisma.userTransaction.update({
-        where: {
-          id: mentee,
-        },
-        data: {
-          status: TransactionStatus.FAILED,
-        },
-      }),
-      this.prisma.userTransaction.update({
-        where: {
-          id: mentor,
-        },
-        data: {
-          status: TransactionStatus.FAILED,
-        },
-      }),
-      this.prisma.programRegister.update({
-        where: {
-          id: sessionId,
-        },
-        data: {
-          isAccepted: false,
-          done: true,
-        },
-      }),
-    ]);
-    return this.prisma.programRegister.findFirst({
-      where: {
-        id: sessionId,
-      },
-    });
+    const [menteeTransaction, mentorTransaction, sessionRegister] =
+      await this.prisma.$transaction([
+        this.prisma.userTransaction.update({
+          where: {
+            id: mentee,
+          },
+          data: {
+            status: TransactionStatus.FAILED,
+          },
+        }),
+        this.prisma.userTransaction.update({
+          where: {
+            id: mentor,
+          },
+          data: {
+            status: TransactionStatus.FAILED,
+          },
+        }),
+        this.prisma.programRegister.update({
+          where: {
+            id: sessionId,
+          },
+          data: {
+            isAccepted: false,
+            done: true,
+          },
+        }),
+      ]);
+    return sessionRegister;
   }
 
   async withdraw(userId: number, coin: number) {
