@@ -31,6 +31,7 @@ model User {
   notified           Notification[]    @relation("nofify_notifier")
   actingNotification Notification[]    @relation("nofify_actor")
   activeCode         ActivationCode[]
+  posts              Post[]
   createAt           DateTime          @default(now())
 }
 
@@ -227,6 +228,33 @@ model ActivationCode {
   createAt  DateTime @default(now())
 }
 
+model Post {
+  id          Int            @id @default(autoincrement())
+  authorId    Int
+  author      User           @relation(fields: [authorId], references: [id])
+  title       String
+  content     String
+  summary     String
+  slug        String         @unique
+  image       String?
+  categories  PostCategory[]
+  isPrivate   Boolean        @default(false)
+  isPublished Boolean        @default(false)
+  publishedAt DateTime?
+  createAt    DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model PostCategory {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  content   String
+  posts     Post[]
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum TransactionStatus {
   PENDING
   SUCCESS
@@ -248,4 +276,5 @@ enum Role {
   MODERATOR
   MENTEE
   MENTOR
+  CONTENTMANAGER
 }

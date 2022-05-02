@@ -20,6 +20,8 @@ import { RatingModule } from './rating/rating.module';
 import { SocketModule } from './socket/socket.module';
 import { MailModule } from './mail/mail.module';
 import { ActivationModule } from './activation/activation.module';
+import { ChatModule } from './chat/chat.module';
+import { BlogModule } from './blog/blog.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { ActivationModule } from './activation/activation.module';
     SocketModule,
     MailModule,
     ActivationModule,
+    ChatModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [AppService],
