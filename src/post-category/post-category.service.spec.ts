@@ -1,20 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BlogService } from './blog.service';
+import { PostCategoryService } from './post-category.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SlugifyService } from '../slugify/slugify.service';
 
 const mockPrismaService = {};
 const mockSlugifyService = {};
 
-describe('BlogService', () => {
-  let service: BlogService;
+describe('PostCategoryService', () => {
+  let service: PostCategoryService;
   let prisma: PrismaService;
   let slugify: SlugifyService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        BlogService,
+        PostCategoryService,
         {
           provide: PrismaService,
           useValue: mockPrismaService,
@@ -26,7 +26,7 @@ describe('BlogService', () => {
       ],
     }).compile();
 
-    service = module.get<BlogService>(BlogService);
+    service = module.get<PostCategoryService>(PostCategoryService);
     prisma = module.get<PrismaService>(PrismaService);
     slugify = module.get<SlugifyService>(SlugifyService);
   });

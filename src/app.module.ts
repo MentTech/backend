@@ -22,6 +22,8 @@ import { MailModule } from './mail/mail.module';
 import { ActivationModule } from './activation/activation.module';
 import { ChatModule } from './chat/chat.module';
 import { BlogModule } from './blog/blog.module';
+import { SlugifyModule } from './slugify/slugify.module';
+import { PostCategoryModule } from './post-category/post-category.module';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { BlogModule } from './blog/blog.module';
     ActivationModule,
     ChatModule,
     BlogModule,
+    SlugifyModule,
+    PostCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
