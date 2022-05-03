@@ -6,6 +6,7 @@ import { SearchPostsDto } from './dto/search-posts.dto';
 import { Prisma } from '@prisma/client';
 import { PaginationResponseDto } from '../dtos/pagination-response.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import * as _ from 'lodash';
 
 @Injectable()
 export class BlogService {
@@ -102,7 +103,22 @@ export class BlogService {
     });
   }
 
-  updatePost(slug: string, dto: UpdatePostDto) {
+  async updatePost(slug: string, dto: UpdatePostDto) {
+    const post = await this.prisma.post.findFirst({
+      where: {
+        slug,
+      },
+      include: {
+        categories: true,
+      },
+    });
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    const { categories } = post;
+    const categoryIds = categories.map((category) => category.id);
+    const categoriesToAdd = _.difference(dto.categories, categoryIds);
+    const categoriesToRemove = _.difference(categoryIds, dto.categories);
     const data: Prisma.PostUpdateInput = {
       title: dto.title,
       content: dto.content,
@@ -110,7 +126,10 @@ export class BlogService {
       image: dto.image,
       isPrivate: dto.isPrivate,
       categories: {
-        connect: dto.categories.map((category) => ({
+        disconnect: categoriesToRemove.map((category) => ({
+          id: category,
+        })),
+        connect: categoriesToAdd.map((category) => ({
           id: category,
         })),
       },
