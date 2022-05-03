@@ -96,6 +96,12 @@ export class MentorController {
     return response;
   }
 
+  @Get('/suggest')
+  @ApiOperation({ summary: 'Get top 3 mentors' })
+  suggestHotMentor() {
+    return this.mentorService.getHotMentors();
+  }
+
   @Get('/:id')
   @UseInterceptors(ClassSerializerInterceptor)
   @ApiOperation({ summary: 'Get mentor by id' })

@@ -16,6 +16,11 @@ import { AverageResponseDto } from '../dtos/average-response.dto';
 import { RatingService } from '../rating/rating.service';
 import { UpdateMentorDto } from './dtos/update-mentor.dto';
 
+export type HotMentor = {
+  count: number;
+  mentorId: number;
+};
+
 @Injectable()
 export class MentorService {
   constructor(
@@ -219,6 +224,42 @@ export class MentorService {
     return mentor;
   }
 
+  async getMultipleMentors(ids: number[]) {
+    const mentors = await this.prisma.user.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        role: Role.MENTOR,
+        isActive: true,
+        User_mentor: {
+          isAccepted: true,
+        },
+      },
+      include: {
+        User_mentor: {
+          include: {
+            programs: true,
+            category: true,
+            skills: {
+              include: {
+                skill: true,
+              },
+            },
+            degree: true,
+            experiences: true,
+          },
+        },
+      },
+    });
+    return mentors.map((mentor: Partial<User> | any) => {
+      mentor.User_mentor.skills = mentor.User_mentor.skills.map(
+        (skill: any) => skill.skill,
+      );
+      return mentor;
+    });
+  }
+
   getAllRating(mentorId: number, query: GetRatingQueryDto) {
     const ratingWhereInput: Prisma.RatingWhereInput = {
       register: {
@@ -369,6 +410,35 @@ export class MentorService {
         },
       },
     });
+  }
+
+  getMultipleMentorsReduce(ids: number[]) {
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        User_mentor: {
+          select: {
+            category: true,
+            experiences: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getHotMentors(num: number = 3) {
+    const aggregate: HotMentor[] = await this.prisma
+      .$queryRaw`SELECT COUNT(*), P."mentorId" FROM "ProgramRegister" PR JOIN "Program" P on PR."programId" = P.id GROUP BY P."mentorId" ORDER BY COUNT(*) desc LIMIT ${num}`;
+    return this.getMultipleMentorsReduce(
+      aggregate.map((mentor) => mentor.mentorId),
+    );
   }
 
   async updateMentor(id: number, updateDto: UpdateMentorDto) {
