@@ -94,6 +94,28 @@ export class BlogService {
       orderBy: {
         [query.orderBy]: query.orderDirection,
       },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        image: true,
+        summary: true,
+        createAt: true,
+        publishedAt: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+        categories: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      }
     });
     return new PaginationResponseDto({
       totalPage: totalPages,

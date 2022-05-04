@@ -97,6 +97,12 @@ export class AuthController {
     return this.authService.signIn(credential, Role.MENTOR);
   }
 
+  @Post('/signIn/content-creator')
+  @ApiOperation({ summary: 'Content creator sign in' })
+  contentCreatorSignIn(@Body() credential: CredentialDto) {
+    return this.authService.signIn(credential, Role.CONTENTMANAGER);
+  }
+
   @Post('/changepassword')
   @UseGuards(JwtAuthenticationGuard)
   @ApiOperation({ summary: 'Change password' })
