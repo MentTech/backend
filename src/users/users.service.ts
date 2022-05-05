@@ -130,4 +130,15 @@ export class UsersService {
       },
     });
   }
+
+  unlockUser(id: number) {
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: true,
+      },
+    });
+  }
 }

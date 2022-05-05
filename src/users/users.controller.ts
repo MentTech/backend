@@ -83,4 +83,12 @@ export class UsersController {
   lockUser(@Param('id') id: string) {
     return this.usersService.lockUser(+id);
   }
+
+  @Patch('/:id/unlock')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Unlock user (ADMIN)' })
+  unlockUser(@Param('id') id: string) {
+    return this.usersService.unlockUser(+id);
+  }
 }
