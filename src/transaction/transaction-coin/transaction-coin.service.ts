@@ -162,6 +162,7 @@ export class TransactionCoinService {
         data: {
           isAccepted: true,
           done: true,
+          doneAt: new Date(),
         },
       }),
     ]);

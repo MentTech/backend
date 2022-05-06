@@ -152,6 +152,7 @@ model ProgramRegister {
   expectedDate DateTime?
   rating       Rating?
   relatedId    String?
+  doneAt       DateTime?
   createAt     DateTime  @default(now())
 }
 

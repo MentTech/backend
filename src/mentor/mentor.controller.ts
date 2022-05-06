@@ -35,11 +35,17 @@ import { GetUser } from '../decorators/get-user.decorator';
 import * as _ from 'lodash';
 import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import { GetRatingsQueryDto } from '../rating/dto/get-ratings-query.dto';
+import { SessionStatisticService } from './session-statistic.service';
+import { MentorGuard } from '../guards/mentor.guard';
+import { SessionStatisticMentorQueryDto } from './dtos/session-statistic-mentor-query.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
 export class MentorController {
-  constructor(private readonly mentorService: MentorService) {}
+  constructor(
+    private readonly mentorService: MentorService,
+    private readonly sessionStatisticService: SessionStatisticService,
+  ) {}
 
   @Post('/apply')
   @ApiResponse({
@@ -121,6 +127,18 @@ export class MentorController {
   @ApiBearerAuth()
   updateMentor(@Param('id') id: string, @Body() form: UpdateMentorDto) {
     return this.mentorService.updateMentor(+id, form);
+  }
+
+  @Get('/:mentorId/register/count')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard, MentorGuard)
+  @Roles(Role.MENTOR, Role.ADMIN)
+  @ApiOperation({ summary: 'Get mentor register count' })
+  @ApiBearerAuth()
+  getMentorRegisterCount(
+    @Param('mentorId') mentorId: string,
+    @Query() query: SessionStatisticMentorQueryDto,
+  ) {
+    return this.sessionStatisticService.getSessionCount(query, +mentorId);
   }
 
   @Get('/:id/admin')

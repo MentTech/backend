@@ -8,6 +8,7 @@ import { ExperienceModule } from './experience/experience.module';
 import { ProgramModule } from './program/program.module';
 import { RatingModule } from '../rating/rating.module';
 import { AchievementModule } from './achievement/achievement.module';
+import { SessionStatisticService } from './session-statistic.service';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { AchievementModule } from './achievement/achievement.module';
     AchievementModule,
   ],
   controllers: [MentorController],
-  providers: [MentorService],
+  providers: [MentorService, SessionStatisticService],
 })
 export class MentorModule {}
