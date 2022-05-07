@@ -3,4 +3,5 @@ export enum NotificationTypeEnum {
   MENTEE_SESSION_ACCEPTED = 2,
   MENTEE_SESSION_REJECTED = 3,
   MENTOR_NEW_RATING = 6,
+  NEW_MESSAGE = 8,
 }

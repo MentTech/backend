@@ -96,4 +96,34 @@ export class SendNotificationService {
       this.logger.error(error);
     }
   }
+
+  async messageReceived(roomId: number, sender: number) {
+    const room = await this.prisma.chatRoom.findFirst({
+      where: { id: roomId },
+      select: {
+        participants: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    const usersToSend = room.participants.filter((user) => user.id !== sender);
+    const pro = usersToSend.map(async (user) => {
+      const notification = await this.prisma.notification.create({
+        data: {
+          typeId: NotificationTypeEnum.NEW_MESSAGE,
+          actorId: sender,
+          notifierId: user.id,
+          message: `${sender} has sent a message to ${roomId}`,
+          additional: {
+            roomId,
+            sender,
+          },
+        },
+      });
+      this.socketService.sendNotification(user.id, notification);
+    });
+    await Promise.all(pro);
+  }
 }
