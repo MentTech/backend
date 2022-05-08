@@ -57,6 +57,16 @@ export class ChatSessionService {
               id: session.id,
             },
           },
+          participants: {
+            connect: [
+              {
+                id: session.user.id,
+              },
+              {
+                id: session.program.mentor.userId,
+              },
+            ],
+          },
         },
       });
       return chatRoom;

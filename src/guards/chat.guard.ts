@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
+  Logger,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
@@ -12,11 +13,14 @@ import { User } from '@prisma/client';
 export class ChatGuard implements CanActivate {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
+  private readonly logger = new Logger('ChatGuard');
+
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const roomId: string = request.params.roomId;
+    this.logger.verbose(`Checking if user is in room ${roomId}`);
     const user: User = request.user;
     if (!user || !roomId) {
       return false;

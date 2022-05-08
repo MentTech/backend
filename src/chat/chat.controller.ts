@@ -39,6 +39,14 @@ export class ChatController {
     );
   }
 
+  @Get('room')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({ summary: 'Get my rooms' })
+  @ApiBearerAuth()
+  getRooms(@GetUser() user: User) {
+    return this.chatService.getMyRooms(user.id);
+  }
+
   @Get('room/:roomId')
   @UseGuards(JwtAuthenticationGuard, ChatGuard)
   @ApiOperation({ summary: 'Get messages' })

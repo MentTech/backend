@@ -22,9 +22,13 @@ import { ActivationModule } from '../activation/activation.module';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => {
+        const nodeEnv = config.get<string>('nodeEnvironment');
         return {
           //secret: config.get<string>('jwt.jwtSecret'),
-          secret: config.get<string>('jwt.jwtSecretRandom'),
+          secret:
+            nodeEnv === 'production'
+              ? config.get<string>('jwt.jwtSecretRandom')
+              : config.get<string>('jwt.jwtSecret'),
           signOptions: {
             expiresIn: config.get<string>('jwt.jwtExpire'),
           },

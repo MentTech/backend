@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SocketService } from '../socket/socket.service';
 import { SocketChatService } from '../socket/socket-chat.service';
@@ -12,6 +12,8 @@ export class ChatService {
     private socketChatService: SocketChatService,
     private readonly sendNotificationService: SendNotificationService,
   ) {}
+
+  private readonly logger = new Logger('ChatService');
 
   async checkUserInRoom(roomId: number, userId: number) {
     const room = await this.prisma.chatRoom.findFirst({
@@ -67,11 +69,29 @@ export class ChatService {
       },
     });
     const socket = this.socketService.fetchSocketWithUserId(userId);
-    if (socket) {
-      await this.socketChatService.sendMessageToRoom(chatRoomId, userId, data);
-    } else {
-      await this.sendNotificationService.messageReceived(chatRoomId, userId);
-    }
+    this.logger.verbose(`Socket: ${socket?.id}`);
+    await this.socketChatService.sendMessageToRoom(chatRoomId, userId, data);
     return data;
+  }
+
+  getMyRooms(userId: number) {
+    return this.prisma.chatRoom.findMany({
+      where: {
+        participants: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+      include: {
+        participants: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+      },
+    });
   }
 }
