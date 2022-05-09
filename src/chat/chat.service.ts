@@ -1,4 +1,8 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SocketService } from '../socket/socket.service';
 import { SocketChatService } from '../socket/socket-chat.service';
@@ -12,8 +16,6 @@ export class ChatService {
     private socketChatService: SocketChatService,
     private readonly sendNotificationService: SendNotificationService,
   ) {}
-
-  private readonly logger = new Logger('ChatService');
 
   async checkUserInRoom(roomId: number, userId: number) {
     const room = await this.prisma.chatRoom.findFirst({
@@ -53,6 +55,20 @@ export class ChatService {
   }
 
   async createMessage(chatRoomId: number, userId: number, message: string) {
+    const chatRoom = await this.prisma.chatRoom.findFirst({
+      where: {
+        id: chatRoomId,
+        isActive: true,
+        participants: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+    if (!chatRoom) {
+      throw new ForbiddenException('Chat room not found or inactive');
+    }
     const data = await this.prisma.chatMessage.create({
       data: {
         room: {
@@ -68,9 +84,21 @@ export class ChatService {
         content: message,
       },
     });
-    const socket = this.socketService.fetchSocketWithUserId(userId);
-    this.logger.verbose(`Socket: ${socket?.id}`);
-    await this.socketChatService.sendMessageToRoom(chatRoomId, userId, data);
+    const notOnlineUser = await this.socketChatService.sendMessageToRoom(
+      chatRoomId,
+      userId,
+      data,
+    );
+    if (notOnlineUser.length) {
+      const pro = notOnlineUser.map((id) =>
+        this.sendNotificationService.receiveMessageNotification(
+          chatRoomId,
+          userId,
+          id,
+        ),
+      );
+      await Promise.all(pro);
+    }
     return data;
   }
 

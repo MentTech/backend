@@ -109,21 +109,43 @@ export class SendNotificationService {
       },
     });
     const usersToSend = room.participants.filter((user) => user.id !== sender);
-    const pro = usersToSend.map(async (user) => {
-      const notification = await this.prisma.notification.create({
-        data: {
-          typeId: NotificationTypeEnum.NEW_MESSAGE,
-          actorId: sender,
-          notifierId: user.id,
-          message: `${sender} has sent a message to ${roomId}`,
-          additional: {
-            roomId,
-            sender,
-          },
-        },
-      });
-      this.socketService.sendNotification(user.id, notification);
-    });
+    const pro = usersToSend.map((user) =>
+      this.receiveMessageNotification(roomId, sender, user.id),
+    );
     await Promise.all(pro);
+  }
+
+  async receiveMessageNotification(
+    roomId: number,
+    sender: number,
+    receiverId: number,
+  ) {
+    const pastNotifications = await this.prisma.notification.findFirst({
+      where: {
+        typeId: NotificationTypeEnum.NEW_MESSAGE,
+        actorId: sender,
+        notifierId: receiverId,
+        isRead: false,
+        createAt: {
+          gte: new Date().toISOString().split('T')[0],
+        },
+      },
+    });
+    if (pastNotifications) {
+      return;
+    }
+    const notification = await this.prisma.notification.create({
+      data: {
+        typeId: NotificationTypeEnum.NEW_MESSAGE,
+        actorId: sender,
+        notifierId: receiverId,
+        message: `${sender} has sent a message to ${roomId}`,
+        additional: {
+          roomId,
+          sender,
+        },
+      },
+    });
+    this.socketService.sendNotification(receiverId, notification);
   }
 }

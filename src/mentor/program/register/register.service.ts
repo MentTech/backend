@@ -118,7 +118,20 @@ export class RegisterService {
     if (!session) {
       throw new NotFoundException('Session not found');
     }
-    return this.transactionCoinService.completeSession(sessionId);
+    await this.transactionCoinService.completeSession(sessionId);
+    const chatRoom = await this.prisma.chatRoom.findFirst({
+      where: {
+        sessionId,
+      },
+    });
+    if (chatRoom) {
+      await this.prisma.chatRoom.update({
+        where: { id: chatRoom.id },
+        data: {
+          isActive: false,
+        },
+      });
+    }
     // return this.prisma.programRegister.update({
     //   where: { id: sessionId },
     //   data: {
