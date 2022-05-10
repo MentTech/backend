@@ -38,6 +38,7 @@ import { GetRatingsQueryDto } from '../rating/dto/get-ratings-query.dto';
 import { SessionStatisticService } from './session-statistic.service';
 import { MentorGuard } from '../guards/mentor.guard';
 import { SessionStatisticMentorQueryDto } from './dtos/session-statistic-mentor-query.dto';
+import { GetMultipleMentorsDto } from './dtos/get-multiple-mentors.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -64,6 +65,15 @@ export class MentorController {
   @ApiBearerAuth()
   updateSelfProfile(@Body() form: UpdateMentorDto, @GetUser() user: User) {
     return this.mentorService.updateMentor(user.id, form);
+  }
+
+  @Get('/multiple')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @ApiOperation({ summary: 'Get multiple mentors detail infomation' })
+  @ApiBearerAuth()
+  async getMultipleMentors(@Query() dto: GetMultipleMentorsDto) {
+    const mentors = await this.mentorService.getMultipleMentors(dto.ids);
+    return mentors.map((mentor) => new MentorResponseDto(mentor));
   }
 
   @Get('/')

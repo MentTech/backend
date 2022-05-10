@@ -418,6 +418,11 @@ export class MentorService {
         id: {
           in: ids,
         },
+        isActive: true,
+        User_mentor: {
+          isAccepted: true,
+        },
+        role: Role.MENTOR,
       },
       select: {
         id: true,
