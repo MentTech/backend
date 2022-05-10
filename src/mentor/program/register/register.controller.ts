@@ -94,7 +94,7 @@ export class RegisterController {
   @ApiOperation({ summary: 'Mentor update an accepted session' })
   @ApiParam({ name: 'mentorId', required: true })
   mentorUpdateSession(
-    @Param('id') sessionId: string,
+    @Param('sessionId') sessionId: string,
     @Param('mentorId') mentorId: string,
     @Body() updateSessionDto: UpdateSessionDto,
   ) {
