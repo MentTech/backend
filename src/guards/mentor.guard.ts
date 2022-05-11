@@ -11,6 +11,9 @@ export class MentorGuard implements CanActivate {
     const user: User = request.user;
     if (!user) return false;
     const mentorId: string = request.params.mentorId;
-    return +mentorId === user.id && user.role === Role.MENTOR;
+    return (
+      user.role === Role.ADMIN ||
+      (+mentorId === user.id && user.role === Role.MENTOR)
+    );
   }
 }

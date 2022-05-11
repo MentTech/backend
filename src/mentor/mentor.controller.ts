@@ -39,6 +39,7 @@ import { SessionStatisticService } from './session-statistic.service';
 import { MentorGuard } from '../guards/mentor.guard';
 import { SessionStatisticMentorQueryDto } from './dtos/session-statistic-mentor-query.dto';
 import { GetMultipleMentorsDto } from './dtos/get-multiple-mentors.dto';
+import { SessionMentorQueryDto } from './dtos/session-mentor-query.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -137,6 +138,18 @@ export class MentorController {
   @ApiBearerAuth()
   updateMentor(@Param('id') id: string, @Body() form: UpdateMentorDto) {
     return this.mentorService.updateMentor(+id, form);
+  }
+
+  @Get('/:mentorId/register')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard, MentorGuard)
+  @Roles(Role.MENTOR, Role.ADMIN)
+  @ApiOperation({ summary: 'Get mentor register' })
+  @ApiBearerAuth()
+  getSessions(
+    @Param('mentorId') mentorId: string,
+    @Query() query: SessionMentorQueryDto,
+  ) {
+    return this.sessionStatisticService.getSessions(query, +mentorId);
   }
 
   @Get('/:mentorId/register/count')
