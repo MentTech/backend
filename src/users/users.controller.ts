@@ -68,11 +68,12 @@ export class UsersController {
   @ApiOperation({ summary: 'Change user avatar' })
   @ApiBearerAuth()
   async changeAvatar(@GetUser() user: User, @Body() body: ChangeAvatarDto) {
-    await this.usersService.changeProfile(user.id, {
+    const updatedUser = await this.usersService.changeProfile(user.id, {
       avatar: body.avatar,
     });
     return {
       message: 'Avatar changed',
+      avatar: updatedUser.avatar,
     };
   }
 
