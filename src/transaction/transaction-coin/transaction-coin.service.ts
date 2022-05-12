@@ -9,6 +9,7 @@ import { GiftCode, TransactionStatus, TransactionType } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { CreateGiftCardDto } from '../dto/create-giftcard.dto';
 import { BalanceResponseDto } from '../dto/balance-response.dto';
+import { CreateRegisterMenteeInfoDto } from '../../mentor/program/register/dto/create-register-mentee-info.dto';
 
 @Injectable()
 export class TransactionCoinService {
@@ -50,7 +51,11 @@ export class TransactionCoinService {
     return balance >= amount;
   }
 
-  async menteeRequestSession(menteeId: number, programId: number) {
+  async menteeRequestSession(
+    menteeId: number,
+    programId: number,
+    dto: CreateRegisterMenteeInfoDto,
+  ) {
     const program = await this.prisma.program.findFirst({
       where: {
         id: programId,
@@ -90,6 +95,9 @@ export class TransactionCoinService {
             user: { connect: { id: menteeId } },
             program: { connect: { id: programId } },
             relatedId: uniqueId,
+            menteeInfo: {
+              create: dto,
+            },
           },
         }),
       ]);

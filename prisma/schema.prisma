@@ -156,7 +156,22 @@ model ProgramRegister {
   relatedId    String?
   doneAt       DateTime?
   chatRoom     ChatRoom?
+  menteeInfo   RegisterMenteeInfo?
   createAt     DateTime  @default(now())
+}
+
+model RegisterMenteeInfo {
+  id           Int       @id @default(autoincrement())
+  registerId   Int
+  register     ProgramRegister @relation(fields: [registerId], references: [id])
+  name         String
+  email        String
+  description  String
+  note         String
+  expectation  String
+  goal         String
+  createAt     DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Rating {

@@ -70,7 +70,7 @@ export class MentorController {
 
   @Get('/multiple')
   @UseInterceptors(ClassSerializerInterceptor)
-  @ApiOperation({ summary: 'Get multiple mentors detail infomation' })
+  @ApiOperation({ summary: 'Get multiple mentors detail information' })
   @ApiBearerAuth()
   async getMultipleMentors(@Query() dto: GetMultipleMentorsDto) {
     const mentors = await this.mentorService.getMultipleMentors(dto.ids);

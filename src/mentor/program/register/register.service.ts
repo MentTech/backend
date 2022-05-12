@@ -10,6 +10,7 @@ import { AcceptSessionDto } from './dto/accept-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { TransactionCoinService } from '../../../transaction/transaction-coin/transaction-coin.service';
 import { SendNotificationService } from '../../../notification/send-notification.service';
+import { CreateRegisterMenteeInfoDto } from './dto/create-register-mentee-info.dto';
 
 @Injectable()
 export class RegisterService {
@@ -20,7 +21,11 @@ export class RegisterService {
     private readonly sendNotificationService: SendNotificationService,
   ) {}
 
-  async requestSession(menteeId: number, programId: number) {
+  async requestSession(
+    menteeId: number,
+    programId: number,
+    dto: CreateRegisterMenteeInfoDto,
+  ) {
     const program = await this.prisma.program.findFirst({
       where: { id: programId },
     });
@@ -49,6 +54,7 @@ export class RegisterService {
     const session = await this.transactionCoinService.menteeRequestSession(
       menteeId,
       programId,
+      dto,
     );
     await this.sendNotificationService.menteeRequestSession(session.id);
     return session;
@@ -148,6 +154,7 @@ export class RegisterService {
       include: {
         program: true,
         user: true,
+        menteeInfo: true,
       },
     });
   }
@@ -160,6 +167,7 @@ export class RegisterService {
       },
       include: {
         program: true,
+        menteeInfo: true,
       },
     });
   }

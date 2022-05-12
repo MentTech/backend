@@ -27,6 +27,7 @@ import { AcceptSessionDto } from './dto/accept-session.dto';
 import { MentorGuard } from '../../../guards/mentor.guard';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
+import { CreateRegisterMenteeInfoDto } from './dto/create-register-mentee-info.dto';
 
 @Controller('mentor/:mentorId/program/:programId/register')
 @ApiTags('Program register')
@@ -38,8 +39,12 @@ export class RegisterController {
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.MENTEE)
   @ApiOperation({ summary: 'Mentee request a session' })
-  requestSession(@GetUser() user: User, @Param('programId') programId: string) {
-    return this.registerService.requestSession(user.id, +programId);
+  requestSession(
+    @GetUser() user: User,
+    @Param('programId') programId: string,
+    @Body() dto: CreateRegisterMenteeInfoDto,
+  ) {
+    return this.registerService.requestSession(user.id, +programId, dto);
   }
 
   @Delete('/:sessionId')

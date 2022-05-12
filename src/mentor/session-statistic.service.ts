@@ -48,6 +48,7 @@ export class SessionStatisticService {
       where,
       include: {
         program: true,
+        menteeInfo: true,
       },
       skip: offset,
       take: limit,
