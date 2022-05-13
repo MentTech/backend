@@ -17,6 +17,7 @@ export class SendNotificationService {
       where: { id: sessionId },
       include: {
         program: true,
+        menteeInfo: true,
       },
     });
     const { program, userId } = session;
@@ -27,7 +28,7 @@ export class SendNotificationService {
           typeId: NotificationTypeEnum.MENTOR_RECEIVE_SESSION_REQUEST,
           actorId: userId,
           notifierId: mentorId,
-          message: `${userId} has requested a session with you`,
+          message: `${session.menteeInfo.name} has requested a session for ${program.title}`,
           additional: {
             programId: program.id,
             sessionId: sessionId,
@@ -55,7 +56,7 @@ export class SendNotificationService {
           typeId: NotificationTypeEnum.MENTEE_SESSION_ACCEPTED,
           actorId: program.mentorId,
           notifierId: userId,
-          message: `${program.mentorId} has accepted your session request`,
+          message: `Your session request for ${program.title} has been accepted`,
           additional: {
             programId: session.program.id,
             sessionId: sessionId,
@@ -83,7 +84,7 @@ export class SendNotificationService {
           typeId: NotificationTypeEnum.MENTEE_SESSION_REJECTED,
           actorId: program.mentorId,
           notifierId: userId,
-          message: `${program.mentorId} has rejected your session request`,
+          message: `Your session request for ${program.title} has been rejected`,
           additional: {
             programId: session.program.id,
             sessionId: sessionId,
@@ -139,7 +140,7 @@ export class SendNotificationService {
         typeId: NotificationTypeEnum.NEW_MESSAGE,
         actorId: sender,
         notifierId: receiverId,
-        message: `${sender} has sent a message to ${roomId}`,
+        message: `You have a new message in room ${roomId}`,
         additional: {
           roomId,
           sender,

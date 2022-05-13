@@ -45,7 +45,7 @@ export class RegisterService {
       },
     });
     registers.forEach((e) => {
-      if (e.done) {
+      if (!e.done) {
         throw new UnprocessableEntityException(
           'You have already registered for this program',
         );
