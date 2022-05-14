@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MentorController } from './mentor.controller';
 import { MentorService } from './mentor.service';
+import { SessionStatisticService } from './session-statistic.service';
+
+const mockSessionStatisticService = {};
 
 describe('MentorController', () => {
   let controller: MentorController;
@@ -12,6 +15,10 @@ describe('MentorController', () => {
         {
           provide: MentorService,
           useValue: {},
+        },
+        {
+          provide: SessionStatisticService,
+          useValue: mockSessionStatisticService,
         },
       ],
     }).compile();

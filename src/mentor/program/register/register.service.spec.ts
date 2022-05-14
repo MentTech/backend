@@ -5,11 +5,13 @@ import { TransactionService } from '../../../transaction/transaction.service';
 import { NotFoundException } from '@nestjs/common';
 import { TransactionCoinService } from '../../../transaction/transaction-coin/transaction-coin.service';
 import { SendNotificationService } from '../../../notification/send-notification.service';
+import { CreateRegisterMenteeInfoDto } from './dto/create-register-mentee-info.dto';
 
 const singleProgram = {
   id: 1,
   title: 'Program 1',
   detail: 'Program 1 description',
+  done: true,
 };
 
 const singleMentee = {
@@ -103,22 +105,26 @@ describe('RegisterService', () => {
   describe('requestSession', () => {
     beforeEach(_beforeEach);
     it('should request new session', async () => {
-      const result = await service.requestSession(1, 1);
+      const result = await service.requestSession(
+        1,
+        1,
+        {} as CreateRegisterMenteeInfoDto,
+      );
       expect(result).toEqual(singleSession);
     });
 
     it('should throw error if program not found', async () => {
       jest.spyOn(prisma.program, 'findFirst').mockResolvedValue(null);
-      await expect(service.requestSession(1, 1)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.requestSession(1, 1, {} as CreateRegisterMenteeInfoDto),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw error if mentee not found', async () => {
       jest.spyOn(prisma.user, 'findFirst').mockResolvedValue(null);
-      await expect(service.requestSession(1, 1)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.requestSession(1, 1, {} as CreateRegisterMenteeInfoDto),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
