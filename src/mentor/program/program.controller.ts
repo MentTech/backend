@@ -99,8 +99,10 @@ export class ProgramController {
     description: 'The program has been successfully fetched.',
     type: ProgramResponseDto,
   })
-  findOne(@Param('id') id: string, @Param('mentorId') mentorId: string) {
-    return this.programService.findOne(+id, +mentorId);
+  async findOne(@Param('id') id: string, @Param('mentorId') mentorId: string) {
+    const program = await this.programService.findOne(+id, +mentorId);
+    const averageRating = await this.programService.averageRating(+id);
+    return { ...program, averageRating };
   }
 
   @Patch(':id')
