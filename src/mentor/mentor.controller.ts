@@ -127,10 +127,9 @@ export class MentorController {
     type: MentorResponseDto,
   })
   async getMentor(@Param('id') id: string) {
-    const mentor = await this.mentorService.getMentor(+id);
+    const mentor: any = await this.mentorService.getMentor(+id);
     const averageRating = await this.mentorService.averageRating(+id);
-    const res = new MentorResponseDto(mentor as any);
-    return { ...res, averageRating };
+    return new MentorResponseDto({ ...mentor, averageRating });
   }
 
   @Patch('/:id')
