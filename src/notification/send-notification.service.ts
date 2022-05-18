@@ -28,7 +28,7 @@ export class SendNotificationService {
           typeId: NotificationTypeEnum.MENTOR_RECEIVE_SESSION_REQUEST,
           actorId: userId,
           notifierId: mentorId,
-          message: `${session.menteeInfo.name} has requested a session for ${program.title}`,
+          message: `${session.menteeInfo.name} đã đặt lịch chương trình ${program.title}`,
           additional: {
             program: {
               id: program.id,
@@ -62,7 +62,7 @@ export class SendNotificationService {
           typeId: NotificationTypeEnum.MENTEE_SESSION_ACCEPTED,
           actorId: program.mentorId,
           notifierId: userId,
-          message: `Your session request for ${program.title} has been accepted`,
+          message: `Lịch hẹn chương trình ${program.title} đã được chấp thuận`,
           additional: {
             program: {
               id: program.id,
@@ -93,7 +93,7 @@ export class SendNotificationService {
           typeId: NotificationTypeEnum.MENTEE_SESSION_REJECTED,
           actorId: program.mentorId,
           notifierId: userId,
-          message: `Your session request for ${program.title} has been rejected`,
+          message: `Lịch hẹn chương trình ${program.title} đã bị từ chối`,
           additional: {
             program: {
               id: program.id,
@@ -152,7 +152,7 @@ export class SendNotificationService {
         typeId: NotificationTypeEnum.NEW_MESSAGE,
         actorId: sender,
         notifierId: receiverId,
-        message: `You have a new message in room ${roomId}`,
+        message: `Bạn có tin nhắn mới trong phòng ${roomId}`,
         additional: {
           roomId,
           sender,
