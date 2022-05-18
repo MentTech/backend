@@ -30,8 +30,14 @@ export class SendNotificationService {
           notifierId: mentorId,
           message: `${session.menteeInfo.name} has requested a session for ${program.title}`,
           additional: {
-            programId: program.id,
+            program: {
+              id: program.id,
+              title: program.title,
+            },
             sessionId: sessionId,
+            mentee: {
+              name: session.menteeInfo.name,
+            },
           },
         },
       });
@@ -58,7 +64,10 @@ export class SendNotificationService {
           notifierId: userId,
           message: `Your session request for ${program.title} has been accepted`,
           additional: {
-            programId: session.program.id,
+            program: {
+              id: program.id,
+              title: program.title,
+            },
             sessionId: sessionId,
           },
         },
@@ -86,7 +95,10 @@ export class SendNotificationService {
           notifierId: userId,
           message: `Your session request for ${program.title} has been rejected`,
           additional: {
-            programId: session.program.id,
+            program: {
+              id: program.id,
+              title: program.title,
+            },
             sessionId: sessionId,
           },
         },
