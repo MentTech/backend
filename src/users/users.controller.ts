@@ -77,6 +77,12 @@ export class UsersController {
     };
   }
 
+  @Get('/:id')
+  @ApiOperation({ summary: 'Get user by id (PUBLIC)' })
+  findUserById(@Param('id') id: string) {
+    return this.usersService.findUserPublicProfile(+id);
+  }
+
   @Patch('/:id/lock')
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.ADMIN)

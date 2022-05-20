@@ -61,6 +61,19 @@ export class UsersService {
     });
   }
 
+  findUserPublicProfile(id: number) {
+    return this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+      },
+    });
+  }
+
   async findAll(query: UserQueryPaginationDto, role: Role) {
     const { limit, page } = query;
     const where: Prisma.UserWhereInput = {
