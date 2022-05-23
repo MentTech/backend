@@ -36,6 +36,7 @@ export class SessionStatisticService {
       },
       isAccepted: query.isAccepted,
       done: query.isDone,
+      isCanceled: query.isCanceled,
       createAt: {
         gte: query.from,
         lte: query.to,

@@ -142,13 +142,14 @@ model Program {
 }
 
 model ProgramRegister {
-  id           Int       @id @default(autoincrement())
+  id           Int                 @id @default(autoincrement())
   programId    Int
-  program      Program   @relation(fields: [programId], references: [id])
+  program      Program             @relation(fields: [programId], references: [id])
   userId       Int
-  user         User      @relation(fields: [userId], references: [id])
-  isAccepted   Boolean   @default(false)
-  done         Boolean   @default(false)
+  user         User                @relation(fields: [userId], references: [id])
+  isAccepted   Boolean             @default(false)
+  done         Boolean             @default(false)
+  isCanceled   Boolean             @default(false)
   contactInfo  String?
   additional   Json?
   expectedDate DateTime?
@@ -157,21 +158,21 @@ model ProgramRegister {
   doneAt       DateTime?
   chatRoom     ChatRoom?
   menteeInfo   RegisterMenteeInfo?
-  createAt     DateTime  @default(now())
+  createAt     DateTime            @default(now())
 }
 
 model RegisterMenteeInfo {
-  id           Int       @id @default(autoincrement())
-  registerId   Int
-  register     ProgramRegister @relation(fields: [registerId], references: [id])
-  name         String
-  email        String
-  description  String
-  note         String
-  expectation  String
-  goal         String
-  createAt     DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id          Int             @id @default(autoincrement())
+  registerId  Int             @unique
+  register    ProgramRegister @relation(fields: [registerId], references: [id])
+  name        String
+  email       String
+  description String
+  note        String
+  expectation String
+  goal        String
+  createAt    DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model Rating {

@@ -204,6 +204,7 @@ export class TransactionCoinService {
           data: {
             isAccepted: false,
             done: true,
+            isCanceled: true,
           },
         }),
       ]);

@@ -4,6 +4,7 @@ import { Role } from '@prisma/client';
 import { UsersService } from '../users/users.service';
 import { UserQueryPaginationDto } from '../users/dtos/user-query-pagination.dto';
 import { UpdateUserDto } from '../users/dtos/update-user.dto';
+import { SessionQueryDto } from '../dtos/session-query.dto';
 
 @Injectable()
 export class MenteeService {
@@ -24,10 +25,11 @@ export class MenteeService {
     return this.userService.changeProfile(id, updateMenteeDto);
   }
 
-  getMySession(id: number) {
+  getMySession(id: number, query: SessionQueryDto) {
     return this.prisma.programRegister.findMany({
       where: {
         userId: id,
+        ...query,
       },
       include: {
         program: true,

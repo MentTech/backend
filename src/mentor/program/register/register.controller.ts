@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -28,6 +29,7 @@ import { MentorGuard } from '../../../guards/mentor.guard';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { CreateRegisterMenteeInfoDto } from './dto/create-register-mentee-info.dto';
+import { SessionQueryDto } from '../../../dtos/session-query.dto';
 
 @Controller('mentor/:mentorId/program/:programId/register')
 @ApiTags('Program register')
@@ -123,13 +125,15 @@ export class RegisterController {
   async getAllSession(
     @GetUser() user: User,
     @Param('programId') programId: string,
+    @Query() query: SessionQueryDto,
   ) {
     if (user.role === Role.MENTEE) {
-      return this.registerService.menteeFindAll(user.id, +programId);
+      return this.registerService.menteeFindAll(user.id, +programId, query);
     } else if (user.role === Role.MENTOR) {
       const sessions = await this.registerService.mentorFindAll(
         user.id,
         +programId,
+        query,
       );
       return sessions.map((session: any) => new RegisterResponseDto(session));
     }

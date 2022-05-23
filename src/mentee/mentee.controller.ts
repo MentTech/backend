@@ -21,6 +21,7 @@ import { UserQueryPaginationDto } from '../users/dtos/user-query-pagination.dto'
 import { UpdateUserDto } from '../users/dtos/update-user.dto';
 import { UserDto } from '../dtos/user.dto';
 import { Serialize } from '../interceptors/serialize.interceptor';
+import { SessionQueryDto } from '../dtos/session-query.dto';
 
 @Controller('mentee')
 @ApiTags('Mentee')
@@ -41,8 +42,8 @@ export class MenteeController {
   @Roles(Role.MENTEE)
   @ApiOperation({ summary: 'Get my session' })
   @ApiBearerAuth()
-  getMySession(@GetUser() user: User) {
-    return this.menteeService.getMySession(user.id);
+  getMySession(@GetUser() user: User, @Query() query: SessionQueryDto) {
+    return this.menteeService.getMySession(user.id, query);
   }
 
   @Get('/favorite')

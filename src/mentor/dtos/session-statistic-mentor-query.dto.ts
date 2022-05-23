@@ -38,4 +38,12 @@ export class SessionStatisticMentorQueryDto {
     description: 'Is done (omit to get all)',
   })
   isDone?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  @Type(() => Boolean)
+  @ApiPropertyOptional({
+    description: 'Is canceled (omit to get all)',
+  })
+  isCanceled?: boolean;
 }

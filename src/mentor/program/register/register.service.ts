@@ -11,6 +11,7 @@ import { UpdateSessionDto } from './dto/update-session.dto';
 import { TransactionCoinService } from '../../../transaction/transaction-coin/transaction-coin.service';
 import { SendNotificationService } from '../../../notification/send-notification.service';
 import { CreateRegisterMenteeInfoDto } from './dto/create-register-mentee-info.dto';
+import { SessionQueryDto } from '../../../dtos/session-query.dto';
 
 @Injectable()
 export class RegisterService {
@@ -146,10 +147,11 @@ export class RegisterService {
     // });
   }
 
-  mentorFindAll(mentorId: number, programId: number) {
+  mentorFindAll(mentorId: number, programId: number, query: SessionQueryDto) {
     return this.prisma.programRegister.findMany({
       where: {
         program: { id: programId, mentorId },
+        ...query,
       },
       include: {
         program: true,
@@ -159,11 +161,12 @@ export class RegisterService {
     });
   }
 
-  menteeFindAll(menteeId: number, programId: number) {
+  menteeFindAll(menteeId: number, programId: number, query: SessionQueryDto) {
     return this.prisma.programRegister.findMany({
       where: {
         program: { id: programId },
         user: { id: menteeId },
+        ...query,
       },
       include: {
         program: true,
