@@ -16,6 +16,8 @@ import { Logger } from '@nestjs/common';
 import { SocketService } from './socket.service';
 import { AuthService } from '../auth/auth.service';
 import * as _ from 'lodash';
+import { SendMessageSocketDto } from './dto/send-message-socket.dto';
+import { ChatSocketService } from '../chat-socket/chat-socket.service';
 
 @WebSocketGateway({
   cors: {
@@ -28,6 +30,7 @@ export class SocketGateway
   constructor(
     private readonly socketService: SocketService,
     private readonly authService: AuthService,
+    private readonly chatSocketService: ChatSocketService,
   ) {}
 
   @WebSocketServer()
@@ -80,6 +83,28 @@ export class SocketGateway
       return 'User disconnected';
     }
     return 'You are not authenticated';
+  }
+
+  @SubscribeMessage('chat:send_message')
+  async sendMessage(
+    @MessageBody() message: SendMessageSocketDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!this.socketService.checkSocketAuthenticated(client.id)) {
+      return 'Unauthenticated';
+    }
+    const roomId = message.roomId;
+    const userId = this.socketService.fetchUserIdWithSocketId(client.id);
+    try {
+      const data = await this.chatSocketService.sendMessage(
+        roomId,
+        userId,
+        message.message,
+      );
+      return data;
+    } catch (e) {
+      return 'Forbidden';
+    }
   }
 
   handleConnection(client: Socket, ...args: any[]) {

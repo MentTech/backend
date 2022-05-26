@@ -15,6 +15,9 @@ export class SocketService {
     const socketClient = this.authenticatedId.find(
       (socketClient) => socketClient.userId === userId,
     );
+    if (!socketClient) {
+      return undefined;
+    }
     return this.server.of('/').sockets.get(socketClient.id);
   }
 
@@ -25,6 +28,23 @@ export class SocketService {
     return socketClients.map((socketClient) =>
       this.server.of('/').sockets.get(socketClient.id),
     );
+  }
+
+  checkSocketAuthenticated(socketId: string): boolean {
+    const socket = this.authenticatedId.find(
+      (client) => client.id === socketId,
+    );
+    return socket !== undefined;
+  }
+
+  fetchUserIdWithSocketId(socketId: string): number {
+    const socketClient = this.authenticatedId.find(
+      (socketClient) => socketClient.id === socketId,
+    );
+    if (!socketClient) {
+      return undefined;
+    }
+    return socketClient.userId;
   }
 
   sendEventToUser(userId: number, event: string, data: any) {

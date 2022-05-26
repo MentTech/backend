@@ -5,9 +5,10 @@ import { SocketNotificationService } from './socket-notification.service';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { SocketChatService } from './socket-chat.service';
+import { ChatSocketModule } from '../chat-socket/chat-socket.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule],
+  imports: [AuthModule, PrismaModule, ChatSocketModule],
   providers: [
     SocketService,
     SocketGateway,
