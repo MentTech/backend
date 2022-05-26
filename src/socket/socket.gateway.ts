@@ -91,10 +91,18 @@ export class SocketGateway
     @ConnectedSocket() client: Socket,
   ) {
     if (!this.socketService.checkSocketAuthenticated(client.id)) {
-      return 'Unauthenticated';
+      return {
+        status: 401,
+        success: false,
+        message: 'You are not authenticated',
+      };
     }
     if (!message.roomId || !message.message) {
-      return 'Invalid message';
+      return {
+        status: 400,
+        success: false,
+        message: 'Bad request',
+      };
     }
     const roomId = message.roomId;
     const userId = this.socketService.fetchUserIdWithSocketId(client.id);
@@ -106,7 +114,11 @@ export class SocketGateway
       );
       return data;
     } catch (e) {
-      return 'Forbidden';
+      return {
+        status: 403,
+        success: false,
+        message: e.message,
+      };
     }
   }
 
