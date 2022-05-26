@@ -93,6 +93,9 @@ export class SocketGateway
     if (!this.socketService.checkSocketAuthenticated(client.id)) {
       return 'Unauthenticated';
     }
+    if (!message.roomId || !message.message) {
+      return 'Invalid message';
+    }
     const roomId = message.roomId;
     const userId = this.socketService.fetchUserIdWithSocketId(client.id);
     try {
