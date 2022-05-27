@@ -122,4 +122,25 @@ export class ChatService {
       },
     });
   }
+
+  async getRoomInfo(roomId: number) {
+    const room = await this.prisma.chatRoom.findFirst({
+      where: {
+        id: roomId,
+      },
+      include: {
+        participants: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+    if (!room) {
+      throw new NotFoundException('Chat room not found');
+    }
+    return room;
+  }
 }
