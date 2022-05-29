@@ -10,13 +10,18 @@ import { PrismaService } from '../prisma/prisma.service';
 export class NotificationService {
   constructor(private readonly prisma: PrismaService) {}
 
-  getNotification(userId: number) {
+  getNotification(userId: number, limit: number, skip: number) {
     return this.prisma.notification.findMany({
       where: {
         notifierId: userId,
       },
       include: {
         type: true,
+      },
+      take: limit,
+      skip,
+      orderBy: {
+        createAt: 'desc',
       },
     });
   }
