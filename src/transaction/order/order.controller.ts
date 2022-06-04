@@ -52,6 +52,19 @@ export class OrderController {
     return this.orderService.getOrder({ id: +id, userId: user.id });
   }
 
+  @Get('/order-id/:orderId')
+  @UseGuards(JwtAuthenticationGuard)
+  @ApiOperation({
+    summary: 'Get order by orderId',
+  })
+  @ApiBearerAuth()
+  getOrderByOrderId(@GetUser() user: User, @Param('orderId') id: string) {
+    if (user.role === Role.ADMIN) {
+      return this.orderService.getOrder({ orderId: id });
+    }
+    return this.orderService.getOrder({ orderId: id, userId: user.id });
+  }
+
   @Post('/top-up')
   @UseGuards(JwtAuthenticationGuard)
   @ApiOperation({
