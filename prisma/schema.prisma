@@ -12,29 +12,30 @@ datasource db {
 }
 
 model User {
-  id                 Int               @id @default(autoincrement())
-  email              String            @unique
+  id                 Int                @id @default(autoincrement())
+  email              String             @unique
   password           String
   name               String?
-  role               Role              @default(MENTEE)
+  role               Role               @default(MENTEE)
   birthday           DateTime?
   phone              String?
   avatar             String?
-  isActive           Boolean           @default(false)
-  coin               Int               @default(0)
-  isPasswordSet      Boolean           @default(false)
+  isActive           Boolean            @default(false)
+  coin               Int                @default(0)
+  isPasswordSet      Boolean            @default(false)
   User_mentor        UserMentor?
-  User_mentee        MenteeProfile?    @relation("mentee_profile")
+  User_mentee        MenteeProfile?     @relation("mentee_profile")
   RegisterHistory    ProgramRegister[]
   transactions       UserTransaction[]
   onWishlist         MenteeProfile[]
-  notified           Notification[]    @relation("nofify_notifier")
-  actingNotification Notification[]    @relation("nofify_actor")
+  notified           Notification[]     @relation("nofify_notifier")
+  actingNotification Notification[]     @relation("nofify_actor")
   activeCode         ActivationCode[]
   posts              Post[]
   chatRooms          ChatRoom[]
   chatMessages       ChatMessage[]
-  createAt           DateTime          @default(now())
+  orders             OrderTransaction[]
+  createAt           DateTime           @default(now())
 }
 
 model UserMentor {
@@ -295,6 +296,36 @@ model ChatMessage {
   user     User     @relation(fields: [userId], references: [id])
   content  String
   createAt DateTime @default(now())
+}
+
+model OrderTransaction {
+  id            Int               @id @default(autoincrement())
+  orderId       String            @unique
+  name          String
+  email         String
+  userId        Int
+  user          User              @relation(fields: [userId], references: [id])
+  orderType     OrderType         @default(TopUp)
+  paymentMethod PaymentMethod     @default(WireTransfer)
+  status        TransactionStatus @default(PENDING)
+  note          String            @default("")
+  token         Int               @default(0)
+  total         Int               @default(0)
+  createAt      DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+enum PaymentMethod {
+  Paypal
+  WireTransfer
+  Momo
+  ViettelPay
+  ZaloPay
+}
+
+enum OrderType {
+  TopUp
+  Withdraw
 }
 
 enum TransactionStatus {

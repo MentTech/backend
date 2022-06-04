@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import authConfig from './config/auth.config';
 import commonConfig from './config/common.config';
 import mailConfig from './config/mail.config';
+import transactionConfig from './config/transaction.config';
 import { MentorModule } from './mentor/mentor.module';
 import { AdminModule } from './admin/admin.module';
 import { SkillModule } from './skill/skill.module';
@@ -33,7 +34,7 @@ import { ChatSocketModule } from './chat-socket/chat-socket.module';
     PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [authConfig, commonConfig, mailConfig],
+      load: [authConfig, commonConfig, mailConfig, transactionConfig],
     }),
     MentorModule,
     AdminModule,
