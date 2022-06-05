@@ -26,6 +26,7 @@ import { BlogModule } from './blog/blog.module';
 import { SlugifyModule } from './slugify/slugify.module';
 import { PostCategoryModule } from './post-category/post-category.module';
 import { ChatSocketModule } from './chat-socket/chat-socket.module';
+import { StatisticModule } from './statistic/statistic.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ChatSocketModule } from './chat-socket/chat-socket.module';
     SlugifyModule,
     PostCategoryModule,
     ChatSocketModule,
+    StatisticModule,
   ],
   controllers: [AppController],
   providers: [AppService],

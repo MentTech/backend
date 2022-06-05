@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { PaginationResponseDto } from '../../dtos/pagination-response.dto';
 import { TransactionCoinService } from '../transaction-coin/transaction-coin.service';
+import { CreateWithdrawOrderDto } from './dto/create-withdraw-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -37,6 +38,27 @@ export class OrderService {
           },
         },
         orderType: OrderType.TopUp,
+        orderId,
+        total,
+        status: TransactionStatus.PENDING,
+      },
+    });
+  }
+
+  createWithdrawOrder(userId: number, dto: CreateWithdrawOrderDto) {
+    const orderId = nanoid();
+    const rate = this.configService.get<number>('transaction.withdrawRate');
+    const total = dto.token * rate;
+    return this.prisma.orderTransaction.create({
+      data: {
+        ...dto,
+        token: -dto.token,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        orderType: OrderType.Withdraw,
         orderId,
         total,
         status: TransactionStatus.PENDING,
@@ -145,10 +167,73 @@ export class OrderService {
     return updatedOrder;
   }
 
+  async processWithdrawOrder(orderId: string, isAccept: boolean) {
+    const order = await this.prisma.orderTransaction.findFirst({
+      where: {
+        orderId,
+        orderType: OrderType.Withdraw,
+        status: TransactionStatus.PENDING,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    if (!order) {
+      throw new NotFoundException('Order not found or already processed');
+    }
+    if (!isAccept) {
+      return this.prisma.orderTransaction.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          status: TransactionStatus.FAILED,
+        },
+      });
+    }
+    const [updatedOrder, transaction] = await this.prisma.$transaction([
+      this.prisma.orderTransaction.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          status: TransactionStatus.SUCCESS,
+        },
+      }),
+      this.prisma.userTransaction.create({
+        data: {
+          user: {
+            connect: {
+              id: order.user.id,
+            },
+          },
+          amount: order.token,
+          type: TransactionType.TOPUP,
+          status: TransactionStatus.SUCCESS,
+          message: `Withdraw with order #${order.orderId}`,
+          relatedId: order.orderId,
+        },
+      }),
+    ]);
+    await this.transactionCoinService.calculateBalance(transaction.userId);
+    return updatedOrder;
+  }
+
   getTopUpRate() {
     const rate = this.configService.get<number>('transaction.topUpRate');
     return {
       topUpRate: rate,
+    };
+  }
+
+  getWithdrawRate() {
+    const rate = this.configService.get<number>('transaction.withdrawRate');
+    return {
+      withdrawRate: rate,
     };
   }
 }

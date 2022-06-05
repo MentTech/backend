@@ -18,6 +18,7 @@ import { CreateTopUpOrderDto } from './dto/create-top-up-order.dto';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../decorators/roles.decorator';
 import { ProcessTopUpOrderDto } from './dto/process-top-up-order.dto';
+import { CreateWithdrawOrderDto } from './dto/create-withdraw-order.dto';
 
 @Controller('order')
 @ApiTags('Order')
@@ -78,6 +79,34 @@ export class OrderController {
     return this.orderService.createTopUpOrder(user.id, dto);
   }
 
+  @Post('/withdraw')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.MENTOR)
+  @ApiOperation({
+    summary: 'Create withdraw order',
+  })
+  @ApiBearerAuth()
+  createWithdrawOrder(
+    @GetUser() user: User,
+    @Body() dto: CreateWithdrawOrderDto,
+  ) {
+    return this.orderService.createWithdrawOrder(user.id, dto);
+  }
+
+  @Patch('/withdraw/:id')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({
+    summary: 'Process withdraw order',
+  })
+  @ApiBearerAuth()
+  processWithdrawOrder(
+    @Param('id') id: string,
+    @Body() dto: ProcessTopUpOrderDto,
+  ) {
+    return this.orderService.processWithdrawOrder(id, dto.isAccept);
+  }
+
   @Patch('/:id')
   @UseGuards(JwtAuthenticationGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -85,7 +114,7 @@ export class OrderController {
     summary: 'Process order',
   })
   @ApiBearerAuth()
-  async updateOrder(
+  async processTopUpOrder(
     @Param('id') id: string,
     @Body() dto: ProcessTopUpOrderDto,
   ) {
@@ -98,5 +127,13 @@ export class OrderController {
   })
   async getTopUpRate() {
     return this.orderService.getTopUpRate();
+  }
+
+  @Get('/rate/withdraw')
+  @ApiOperation({
+    summary: 'Get withdraw rate',
+  })
+  getWithdrawRate() {
+    return this.orderService.getWithdrawRate();
   }
 }
