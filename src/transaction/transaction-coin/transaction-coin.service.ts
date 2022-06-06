@@ -326,6 +326,15 @@ export class TransactionCoinService {
       orderBy: {
         createAt: query.orderByDirection,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+      },
     });
     return new PaginationResponseDto({
       page,
