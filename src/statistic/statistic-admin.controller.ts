@@ -46,4 +46,12 @@ export class StatisticAdminController {
   getNewUserStatistic(@Query() query: ProfitQueryDto) {
     return this.statisticAdminService.newUserStatistic(query.months);
   }
+
+  @Get('session-done')
+  @ApiOperation({
+    summary: 'Get done session statistic',
+  })
+  getDoneSessionStatistic(@Query() query: ProfitQueryDto) {
+    return this.statisticAdminService.doneSessionStatistic(query.months);
+  }
 }

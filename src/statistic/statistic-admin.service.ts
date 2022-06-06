@@ -171,4 +171,37 @@ export class StatisticAdminService {
       mentor: newMentor,
     };
   }
+
+  calculateDoneSession(startDate: Date, endDate: Date) {
+    return this.prisma.programRegister.count({
+      where: {
+        isAccepted: true,
+        done: true,
+        createAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+  }
+
+  async doneSessionStatistic(numberOfMonths: number) {
+    const doneSession = [];
+    for (let i = 0; i < numberOfMonths; i++) {
+      const startDate = moment()
+        .subtract(i, 'months')
+        .startOf('month')
+        .toDate();
+      const endDate = moment().subtract(i, 'months').endOf('month').toDate();
+      const doneSessionMonth = await this.calculateDoneSession(
+        startDate,
+        endDate,
+      );
+      doneSession.push({
+        month: moment(startDate).format('MMM YYYY'),
+        doneSession: doneSessionMonth,
+      });
+    }
+    return doneSession;
+  }
 }
