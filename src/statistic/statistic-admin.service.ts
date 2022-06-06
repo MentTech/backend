@@ -26,7 +26,7 @@ export class StatisticAdminService {
     });
     const date30DaysAgo = new Date();
     date30DaysAgo.setDate(date30DaysAgo.getDate() - 30);
-    const profit = this.calculateProfit(date30DaysAgo, new Date());
+    const profit = await this.calculateProfit(date30DaysAgo, new Date());
     return {
       mentee: numberOfMentee,
       mentor: numberOfMentor,

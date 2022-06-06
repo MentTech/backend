@@ -9,6 +9,7 @@ import authConfig from './config/auth.config';
 import commonConfig from './config/common.config';
 import mailConfig from './config/mail.config';
 import transactionConfig from './config/transaction.config';
+import paypalConfig from './config/paypal.config';
 import { MentorModule } from './mentor/mentor.module';
 import { AdminModule } from './admin/admin.module';
 import { SkillModule } from './skill/skill.module';
@@ -35,7 +36,13 @@ import { StatisticModule } from './statistic/statistic.module';
     PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [authConfig, commonConfig, mailConfig, transactionConfig],
+      load: [
+        authConfig,
+        commonConfig,
+        mailConfig,
+        transactionConfig,
+        paypalConfig,
+      ],
     }),
     MentorModule,
     AdminModule,
