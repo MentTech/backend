@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -20,15 +21,20 @@ import { TransactionCoinService } from '../transaction-coin/transaction-coin.ser
 import { CreateWithdrawOrderDto } from './dto/create-withdraw-order.dto';
 import { payment, Payment, PaymentResponse } from 'paypal-rest-sdk';
 import { PaypalService } from '../../paypal/paypal.service';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
+import * as moment from 'moment';
 import ExecuteRequest = payment.ExecuteRequest;
 
 @Injectable()
 export class OrderService {
+  private readonly logger = new Logger();
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly transactionCoinService: TransactionCoinService,
     private readonly paypalService: PaypalService,
+    private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
   createTopUpOrder(userId: number, dto: CreateTopUpOrderDto) {
@@ -305,10 +311,43 @@ export class OrderService {
         status: TransactionStatus.PENDING,
       },
     });
+    this.createPaypalTimeout(order.orderId);
     return {
       order,
       approveUrl: payment.url,
     };
+  }
+
+  createPaypalTimeout(orderId: string) {
+    const callback = async () => {
+      this.logger.verbose(`Paypal timeout for order ${orderId}`);
+      const order = await this.prisma.orderTransaction.findFirst({
+        where: {
+          orderId,
+          orderType: OrderType.TopUp,
+          status: TransactionStatus.PENDING,
+        },
+      });
+      if (!order) {
+        return;
+      }
+      this.prisma.orderTransaction.update({
+        where: {
+          orderId,
+        },
+        data: {
+          status: TransactionStatus.FAILED,
+        },
+      });
+    };
+    const timeOut = setTimeout(callback, 3 * 60 * 60 * 1000);
+    this.schedulerRegistry.addTimeout(orderId, timeOut);
+  }
+
+  deleteTimeout(name: string) {
+    const timeOut = this.schedulerRegistry.getTimeout(name);
+    clearTimeout(timeOut);
+    this.schedulerRegistry.deleteTimeout(name);
   }
 
   createPaypalPayment(payment: Payment) {
@@ -342,6 +381,7 @@ export class OrderService {
       if (payment.state !== 'approved') {
         throw new BadRequestException('Payment not approved');
       }
+      this.deleteTimeout(order.orderId);
       return await this.processTopUpOrder(paymentId, true);
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -365,5 +405,29 @@ export class OrderService {
         },
       );
     });
+  }
+
+  @Cron('0 0 0 * * *')
+  async closeExpiredOrder() {
+    const expiredTime = moment().subtract(3, 'days').toDate();
+    const orders = await this.prisma.orderTransaction.findMany({
+      where: {
+        orderType: OrderType.TopUp,
+        status: TransactionStatus.PENDING,
+        createAt: {
+          lt: expiredTime,
+        },
+      },
+    });
+    for (const order of orders) {
+      this.prisma.orderTransaction.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          status: TransactionStatus.FAILED,
+        },
+      });
+    }
   }
 }

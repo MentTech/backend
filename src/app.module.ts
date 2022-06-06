@@ -29,6 +29,7 @@ import { PostCategoryModule } from './post-category/post-category.module';
 import { ChatSocketModule } from './chat-socket/chat-socket.module';
 import { StatisticModule } from './statistic/statistic.module';
 import { PaypalModule } from './paypal/paypal.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { PaypalModule } from './paypal/paypal.module';
     ChatSocketModule,
     StatisticModule,
     PaypalModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
