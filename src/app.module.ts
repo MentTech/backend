@@ -28,6 +28,7 @@ import { SlugifyModule } from './slugify/slugify.module';
 import { PostCategoryModule } from './post-category/post-category.module';
 import { ChatSocketModule } from './chat-socket/chat-socket.module';
 import { StatisticModule } from './statistic/statistic.module';
+import { PaypalModule } from './paypal/paypal.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { StatisticModule } from './statistic/statistic.module';
     PostCategoryModule,
     ChatSocketModule,
     StatisticModule,
+    PaypalModule,
   ],
   controllers: [AppController],
   providers: [AppService],

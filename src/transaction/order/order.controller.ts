@@ -11,7 +11,7 @@ import {
 import { OrderService } from './order.service';
 import JwtAuthenticationGuard from '../../auth/guards/jwt-authentiacation.guard';
 import { GetUser } from '../../decorators/get-user.decorator';
-import { Role, User } from '@prisma/client';
+import { PaymentMethod, Role, User } from '@prisma/client';
 import { GetOrdersQueryDto } from './dto/get-orders-query.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateTopUpOrderDto } from './dto/create-top-up-order.dto';
@@ -19,6 +19,7 @@ import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../decorators/roles.decorator';
 import { ProcessTopUpOrderDto } from './dto/process-top-up-order.dto';
 import { CreateWithdrawOrderDto } from './dto/create-withdraw-order.dto';
+import { PaypalSuccessQueryDto } from './dto/paypal-success-query.dto';
 
 @Controller('order')
 @ApiTags('Order')
@@ -76,6 +77,9 @@ export class OrderController {
     @GetUser() user: User,
     @Body() dto: CreateTopUpOrderDto,
   ) {
+    if (dto.paymentMethod === PaymentMethod.Paypal) {
+      return this.orderService.createPaypalOrder(user.id, dto);
+    }
     return this.orderService.createTopUpOrder(user.id, dto);
   }
 
@@ -135,5 +139,18 @@ export class OrderController {
   })
   getWithdrawRate() {
     return this.orderService.getWithdrawRate();
+  }
+
+  // @Post('/paypal/create-payment')
+  // createPaypalPayment(@Body() dto: PaypalPaymentDto) {
+  //   return this.orderService.createPaypalOrder(null, {
+  //     token: dto.token,
+  //     paymentMethod: PaymentMethod.Paypal,
+  //   } as CreateTopUpOrderDto);
+  // }
+
+  @Get('/paypal/success')
+  approvePaypalPayment(@Query() query: PaypalSuccessQueryDto) {
+    return this.orderService.approvePaypalOrder(query.paymentId, query.PayerID);
   }
 }
