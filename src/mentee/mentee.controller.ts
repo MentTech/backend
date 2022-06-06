@@ -43,6 +43,7 @@ export class MenteeController {
   @ApiOperation({ summary: 'Get my session' })
   @ApiBearerAuth()
   getMySession(@GetUser() user: User, @Query() query: SessionQueryDto) {
+    console.log(query);
     return this.menteeService.getMySession(user.id, query);
   }
 

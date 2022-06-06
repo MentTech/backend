@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class MentorQueryDto {
   @ApiPropertyOptional({
@@ -8,6 +8,10 @@ export class MentorQueryDto {
     description: 'query for pending mentors',
   })
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   pending?: boolean;
 }
