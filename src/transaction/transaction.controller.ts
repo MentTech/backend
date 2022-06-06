@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { TransactionCoinService } from './transaction-coin/transaction-coin.service';
 import { CreateGiftCardDto } from './dto/create-giftcard.dto';
 import { ApplyGiftCardDto } from './dto/apply-giftcard.dto';
@@ -15,6 +15,7 @@ import {
 } from '@nestjs/swagger';
 import { TopUpDto } from './dto/topup.dto';
 import { BalanceResponseDto } from './dto/balance-response.dto';
+import { TransactionQueryDto } from './dto/transaction-query.dto';
 
 @Controller('transaction')
 @ApiTags('Transaction')
@@ -74,5 +75,14 @@ export class TransactionController {
     return {
       message: 'TopUp successfully',
     };
+  }
+
+  @Get('/')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Get all transactions (ADMIN)' })
+  @ApiBearerAuth()
+  getAllTransactions(@Query() query: TransactionQueryDto) {
+    return this.transactionService.queryTransactions(query);
   }
 }

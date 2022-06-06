@@ -5,11 +5,18 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { GiftCode, TransactionStatus, TransactionType } from '@prisma/client';
+import {
+  GiftCode,
+  Prisma,
+  TransactionStatus,
+  TransactionType,
+} from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { CreateGiftCardDto } from '../dto/create-giftcard.dto';
 import { BalanceResponseDto } from '../dto/balance-response.dto';
 import { CreateRegisterMenteeInfoDto } from '../../mentor/program/register/dto/create-register-mentee-info.dto';
+import { TransactionQueryDto } from '../dto/transaction-query.dto';
+import { PaginationResponseDto } from '../../dtos/pagination-response.dto';
 
 @Injectable()
 export class TransactionCoinService {
@@ -301,6 +308,30 @@ export class TransactionCoinService {
     return new BalanceResponseDto({
       transactions,
       balance,
+    });
+  }
+
+  async queryTransactions(query: TransactionQueryDto) {
+    const { page, limit } = query;
+    const where: Prisma.UserTransactionWhereInput = {
+      type: query.type,
+      status: query.status,
+    };
+    const count = await this.prisma.userTransaction.count({ where });
+    const totalPage = Math.ceil(count / limit);
+    const transactions = await this.prisma.userTransaction.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        createAt: query.orderByDirection,
+      },
+    });
+    return new PaginationResponseDto({
+      page,
+      totalPage,
+      limit,
+      data: transactions,
     });
   }
 }
