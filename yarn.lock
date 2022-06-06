@@ -5826,6 +5826,7 @@ __metadata:
     helmet: ^5.0.2
     jest: ^27.2.5
     lodash: ^4.17.21
+    moment: ^2.29.3
     nanoid: ^3.3.1
     nodemailer: ^6.7.3
     passport: ^0.5.2
@@ -6672,6 +6673,13 @@ __metadata:
   bin:
     mkdirp: bin/cmd.js
   checksum: a96865108c6c3b1b8e1d5e9f11843de1e077e57737602de1b82030815f311be11f96f09cce59bd5b903d0b29834733e5313f9301e3ed6d6f6fba2eae0df4298f
+  languageName: node
+  linkType: hard
+
+"moment@npm:^2.29.3":
+  version: 2.29.3
+  resolution: "moment@npm:2.29.3"
+  checksum: 2e780e36d9a1823c08a1b6313cbb08bd01ecbb2a9062095820a34f42c878991ccba53abaa6abb103fd5c01e763724f295162a8c50b7e95b4f1c992ef0772d3f0
   languageName: node
   linkType: hard
 
