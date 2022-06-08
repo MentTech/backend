@@ -252,7 +252,11 @@ export class OrderService {
     };
   }
 
-  async createPaypalOrder(userId: number, dto: CreateTopUpOrderDto) {
+  async createPaypalOrder(
+    userId: number,
+    dto: CreateTopUpOrderDto,
+    origin: string,
+  ) {
     if (dto.paymentMethod !== PaymentMethod.Paypal) {
       throw new BadRequestException('Invalid payment method');
     }
@@ -264,7 +268,7 @@ export class OrderService {
     const vndPrice =
       dto.token * this.configService.get<number>('transaction.topUpRate');
 
-    const webUrl = this.configService.get<string>('url.web');
+    const webUrl = origin || this.configService.get<string>('url.web');
 
     const create_payment_json: Payment = {
       intent: 'sale',

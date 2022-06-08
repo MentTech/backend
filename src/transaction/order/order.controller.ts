@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Param,
   Patch,
   Post,
@@ -76,9 +77,11 @@ export class OrderController {
   async createTopUpOrder(
     @GetUser() user: User,
     @Body() dto: CreateTopUpOrderDto,
+    @Headers() header: any,
   ) {
     if (dto.paymentMethod === PaymentMethod.Paypal) {
-      return this.orderService.createPaypalOrder(user.id, dto);
+      const host: string = header.origin;
+      return this.orderService.createPaypalOrder(user.id, dto, host);
     }
     return this.orderService.createTopUpOrder(user.id, dto);
   }
