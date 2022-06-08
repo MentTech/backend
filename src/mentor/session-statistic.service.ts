@@ -53,6 +53,9 @@ export class SessionStatisticService {
       },
       skip: offset,
       take: limit,
+      orderBy: {
+        createAt: query.orderDirection,
+      },
     });
     return new PaginationResponseDto<RegisterResponseDto>({
       page,

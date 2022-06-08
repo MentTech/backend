@@ -27,7 +27,7 @@ import ExecuteRequest = payment.ExecuteRequest;
 
 @Injectable()
 export class OrderService {
-  private readonly logger = new Logger();
+  private readonly logger = new Logger('OrderService');
 
   constructor(
     private readonly prisma: PrismaService,
@@ -273,7 +273,7 @@ export class OrderService {
       },
       redirect_urls: {
         return_url: `${webUrl}/order/paypal/success`,
-        cancel_url: `${webUrl}/order/cancel`,
+        cancel_url: `${webUrl}/order/paypal/cancel`,
       },
       transactions: [
         {
@@ -331,7 +331,7 @@ export class OrderService {
       if (!order) {
         return;
       }
-      this.prisma.orderTransaction.update({
+      const updatedOrder = await this.prisma.orderTransaction.update({
         where: {
           orderId,
         },
@@ -339,6 +339,7 @@ export class OrderService {
           status: TransactionStatus.FAILED,
         },
       });
+      this.logger.verbose(`Order ${updatedOrder.orderId} closed`);
     };
     const timeOut = setTimeout(callback, 3 * 60 * 60 * 1000);
     this.schedulerRegistry.addTimeout(orderId, timeOut);
@@ -409,6 +410,7 @@ export class OrderService {
 
   @Cron('0 0 0 * * *')
   async closeExpiredOrder() {
+    this.logger.log('Close expired order');
     const expiredTime = moment().subtract(3, 'days').toDate();
     const orders = await this.prisma.orderTransaction.findMany({
       where: {
@@ -420,7 +422,7 @@ export class OrderService {
       },
     });
     for (const order of orders) {
-      this.prisma.orderTransaction.update({
+      const updatedOrder = await this.prisma.orderTransaction.update({
         where: {
           id: order.id,
         },
@@ -428,6 +430,34 @@ export class OrderService {
           status: TransactionStatus.FAILED,
         },
       });
+      this.logger.log(`Close expired order ${updatedOrder.orderId}`);
     }
   }
+
+  // @Cron('0 * * * * *')
+  // async checkPaypalOrder() {
+  //   this.logger.log('Close expired paypal order');
+  //   const expiredTime = moment().subtract(3, 'hours').toDate();
+  //   const orders = await this.prisma.orderTransaction.findMany({
+  //     where: {
+  //       orderType: OrderType.TopUp,
+  //       status: TransactionStatus.PENDING,
+  //       paymentMethod: PaymentMethod.Paypal,
+  //       createAt: {
+  //         lt: expiredTime,
+  //       },
+  //     },
+  //   });
+  //   for (const order of orders) {
+  //     this.logger.log(`Close expired paypal order ${order.orderId}`);
+  //     const updated = await this.prisma.orderTransaction.update({
+  //       where: {
+  //         id: order.id,
+  //       },
+  //       data: {
+  //         status: TransactionStatus.FAILED,
+  //       },
+  //     });
+  //   }
+  // }
 }
