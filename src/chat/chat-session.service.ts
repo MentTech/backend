@@ -44,11 +44,13 @@ export class ChatSessionService {
     if (!session.isAccepted) {
       throw new ForbiddenException('Session not accepted');
     }
-    if (session.done) {
-      throw new ForbiddenException('Session already done');
-    }
     let chatRoom = session.chatRoom;
     if (!session.chatRoom) {
+      if (session.done) {
+        throw new ForbiddenException(
+          'Session is already done and chatroom was never created',
+        );
+      }
       chatRoom = await this.prisma.chatRoom.create({
         data: {
           name: session.program.title,
