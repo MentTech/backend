@@ -255,7 +255,7 @@ export class OrderService {
   async createPaypalOrder(
     userId: number,
     dto: CreateTopUpOrderDto,
-    origin: string,
+    origin?: string,
   ) {
     if (dto.paymentMethod !== PaymentMethod.Paypal) {
       throw new BadRequestException('Invalid payment method');
@@ -386,6 +386,7 @@ export class OrderService {
       if (payment.state !== 'approved') {
         throw new BadRequestException('Payment not approved');
       }
+      this.logger.verbose(`Payment ${paymentId} approved`);
       this.deleteTimeout(order.orderId);
       return await this.processTopUpOrder(paymentId, true);
     } catch (error) {

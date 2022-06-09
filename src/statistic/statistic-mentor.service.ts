@@ -8,15 +8,15 @@ export class StatisticMentorService {
 
   async getNumberOfMentee(mentorId: number) {
     const ret = await this.prisma
-      .$executeRaw`SELECT count(distinct pr."userId") as "mentee"
+      .$queryRaw`SELECT count(distinct pr."userId") as "mentee"
                     from "ProgramRegister" pr 
                     join "Program" p
                     on pr."programId" = p.id 
                     join "UserMentor" um 
                     on p."mentorId" = um."userId" 
-                    where um."userId" = ${mentorId}`;
+                    where um."userId" = ${mentorId} and pr."isAccepted" = true`;
     return {
-      mentee: ret || 0,
+      mentee: ret[0]?.mentee || 0,
     };
   }
 
