@@ -9,6 +9,7 @@ import { ProgramModule } from './program/program.module';
 import { RatingModule } from '../rating/rating.module';
 import { AchievementModule } from './achievement/achievement.module';
 import { SessionStatisticService } from './session-statistic.service';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { SessionStatisticService } from './session-statistic.service';
     ProgramModule,
     RatingModule,
     AchievementModule,
+    MailModule,
   ],
   controllers: [MentorController],
   providers: [MentorService, SessionStatisticService],

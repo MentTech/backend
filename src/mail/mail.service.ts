@@ -23,4 +23,17 @@ export class MailService {
       },
     });
   }
+
+  async sendMentorConfirmationEmail(user: User, password: string) {
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Mentor application accepted',
+      template: 'mentor-confirm',
+      context: {
+        name: user.name,
+        email: user.email,
+        password,
+      },
+    });
+  }
 }

@@ -15,6 +15,8 @@ import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
 import { AverageResponseDto } from '../dtos/average-response.dto';
 import { RatingService } from '../rating/rating.service';
 import { UpdateMentorDto } from './dtos/update-mentor.dto';
+import { customAlphabet } from 'nanoid';
+import { MailService } from 'src/mail/mail.service';
 
 export type HotMentor = {
   count: number;
@@ -27,6 +29,7 @@ export class MentorService {
     private readonly prisma: PrismaService,
     private readonly authService: AuthService,
     private readonly ratingService: RatingService,
+    private readonly mailService: MailService,
   ) {}
 
   async submitMentor(form: SubmitMentorDto) {
@@ -115,10 +118,17 @@ export class MentorService {
     if (!mentor) {
       throw new NotFoundException('Application not found');
     }
+    const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 10);
+    const password = nanoid();
+    const hashedPassword = await this.authService.createHashedPassword(
+      password,
+    );
+    await this.mailService.sendMentorConfirmationEmail(mentor, password);
     return this.prisma.user.update({
       where: { id },
       data: {
         isActive: true,
+        password: hashedPassword,
         User_mentor: {
           update: {
             isAccepted: true,
