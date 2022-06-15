@@ -48,7 +48,11 @@ export class AuthService {
         isPasswordSet,
       );
       if (isPasswordSet) {
-        await this.activationService.sendActivationEmail(user);
+        try {
+          await this.activationService.sendActivationEmail(user);
+        } catch (e) {
+          this.logger.error(e);
+        }
       }
       return user;
     } catch (err) {
