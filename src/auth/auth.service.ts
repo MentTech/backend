@@ -46,7 +46,9 @@ export class AuthService {
         Role.MENTEE,
         isPasswordSet,
       );
-      await this.activationService.sendActivationEmail(user);
+      if (isPasswordSet) {
+        await this.activationService.sendActivationEmail(user);
+      }
       return user;
     } catch (err) {
       this.logger.error(err);
