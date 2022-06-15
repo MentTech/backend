@@ -11,10 +11,13 @@ import { ConfigService } from '@nestjs/config';
         return {
           transport: {
             host: config.get<string>('mail.smtpHost'),
-            port: 587,
+            port: 465,
+            secure: true,
             auth: {
+              type: 'OAuth2',
               user: config.get<string>('mail.username'),
-              pass: config.get<string>('mail.password'),
+              accessToken: config.get<string>('mail.accessToken'),
+              refreshToken: config.get<string>('mail.refreshToken'),
             },
           },
           defaults: {
