@@ -40,7 +40,7 @@ export class TransactionCoinService {
           id: userId,
         },
         data: {
-          coin: balance._sum.amount,
+          coin: balance._sum.amount || 0,
         },
       });
       return balance._sum.amount;
