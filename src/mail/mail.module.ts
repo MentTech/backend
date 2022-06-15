@@ -18,6 +18,8 @@ import { ConfigService } from '@nestjs/config';
               user: config.get<string>('mail.username'),
               accessToken: config.get<string>('mail.accessToken'),
               refreshToken: config.get<string>('mail.refreshToken'),
+              clientId: config.get<string>('google.googleClientId'),
+              clientSecret: config.get<string>('google.googleSecret'),
             },
           },
           defaults: {
