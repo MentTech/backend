@@ -21,6 +21,7 @@ export class UsersService {
       avatar,
       role,
       isPasswordSet,
+      isActive: !isPasswordSet,
     };
     if (role === Role.MENTEE) {
       userCreate.User_mentee = {
