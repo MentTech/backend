@@ -21,8 +21,12 @@ export class UsersService {
       avatar,
       role,
       isPasswordSet,
-      isActive: !isPasswordSet,
     };
+    if (isPasswordSet) {
+      userCreate.isActive = false;
+    } else {
+      userCreate.isActive = true;
+    }
     if (role === Role.MENTEE) {
       userCreate.User_mentee = {
         create: {},

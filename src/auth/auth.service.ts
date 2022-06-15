@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   UnauthorizedException,
@@ -78,9 +79,7 @@ export class AuthService {
     ) {
       if (!user.isActive) {
         if (!(await this.activationService.isUserActivated(user.id))) {
-          throw new UnauthorizedException(
-            'You have not activated your account',
-          );
+          throw new ForbiddenException('You have not activated your account');
         }
         throw new UnauthorizedException('Your account has been deactivated');
       }
