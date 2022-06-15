@@ -35,7 +35,7 @@ export class TransactionCoinService {
           },
         },
       });
-      await this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: {
           id: userId,
         },
@@ -43,7 +43,7 @@ export class TransactionCoinService {
           coin: balance._sum.amount || 0,
         },
       });
-      return balance._sum.amount;
+      return updatedUser.coin;
     } catch (error) {
       console.log(error);
       return -1;
