@@ -223,4 +223,10 @@ export class MentorController {
   getSuggestion(@Param('id') id: string, @Query('num') query: SuggestQueryDto) {
     return this.mentorService.suggestMentors(+id, query.num);
   }
+
+  @Get('/:id/mentee/count')
+  @ApiOperation({ summary: 'Get mentor mentee count' })
+  getMenteeCount(@Param('id') id: string) {
+    return this.mentorService.getNumberOfMentee(+id);
+  }
 }
