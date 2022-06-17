@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -375,11 +376,16 @@ export class OrderService {
       where: {
         orderId: paymentId,
         orderType: OrderType.TopUp,
-        status: TransactionStatus.PENDING,
       },
     });
     if (!order) {
       throw new NotFoundException('Order not found');
+    }
+    if (order.status === TransactionStatus.SUCCESS) {
+      throw new ForbiddenException('Order already processed');
+    }
+    if (order.status === TransactionStatus.FAILED) {
+      throw new ForbiddenException('Order already failed');
     }
     try {
       const payment = await this.executePaypalOrder(paymentId, payerId);
