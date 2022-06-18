@@ -445,30 +445,30 @@ export class OrderService {
     }
   }
 
-  // @Cron('0 * * * * *')
-  // async checkPaypalOrder() {
-  //   this.logger.log('Close expired paypal order');
-  //   const expiredTime = moment().subtract(3, 'hours').toDate();
-  //   const orders = await this.prisma.orderTransaction.findMany({
-  //     where: {
-  //       orderType: OrderType.TopUp,
-  //       status: TransactionStatus.PENDING,
-  //       paymentMethod: PaymentMethod.Paypal,
-  //       createAt: {
-  //         lt: expiredTime,
-  //       },
-  //     },
-  //   });
-  //   for (const order of orders) {
-  //     this.logger.log(`Close expired paypal order ${order.orderId}`);
-  //     const updated = await this.prisma.orderTransaction.update({
-  //       where: {
-  //         id: order.id,
-  //       },
-  //       data: {
-  //         status: TransactionStatus.FAILED,
-  //       },
-  //     });
-  //   }
-  // }
+  @Cron('0 0 0 * * *')
+  async checkPaypalOrder() {
+    this.logger.log('Close expired paypal order');
+    const expiredTime = moment().subtract(3, 'hours').toDate();
+    const orders = await this.prisma.orderTransaction.findMany({
+      where: {
+        orderType: OrderType.TopUp,
+        status: TransactionStatus.PENDING,
+        paymentMethod: PaymentMethod.Paypal,
+        createAt: {
+          lt: expiredTime,
+        },
+      },
+    });
+    for (const order of orders) {
+      this.logger.log(`Close expired paypal order ${order.orderId}`);
+      await this.prisma.orderTransaction.update({
+        where: {
+          id: order.id,
+        },
+        data: {
+          status: TransactionStatus.FAILED,
+        },
+      });
+    }
+  }
 }

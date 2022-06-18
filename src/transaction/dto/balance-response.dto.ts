@@ -5,7 +5,7 @@ export class BalanceResponseDto {
   @ApiProperty()
   balance: number;
 
-  @ApiProperty()
+  @ApiProperty({ type: Object })
   transactions: UserTransaction[];
 
   constructor(props: Partial<BalanceResponseDto>) {
