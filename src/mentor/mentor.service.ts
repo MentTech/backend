@@ -89,7 +89,6 @@ export class MentorService {
       where = {
         AND: {
           role: Role.MENTOR,
-          isActive: !pending,
           User_mentor: {
             isAccepted: !pending,
           },
