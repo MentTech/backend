@@ -84,9 +84,9 @@ export class MentorService {
       where: {
         AND: {
           role: Role.MENTOR,
-          isActive: pending ? false : undefined,
+          isActive: !pending,
           User_mentor: {
-            isAccepted: pending ? false : undefined,
+            isAccepted: !pending,
           },
         },
       },

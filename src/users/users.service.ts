@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -149,7 +153,25 @@ export class UsersService {
     });
   }
 
-  unlockUser(id: number) {
+  async unlockUser(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        User_mentor: true,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (user.role === Role.MENTOR) {
+      if (!user.isActive && !user.User_mentor.isAccepted) {
+        throw new BadRequestException(
+          'You need to accept the mentor request first',
+        );
+      }
+    }
     return this.prisma.user.update({
       where: {
         id,
