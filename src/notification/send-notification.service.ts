@@ -40,6 +40,9 @@ export class SendNotificationService {
             },
           },
         },
+        include: {
+          type: true,
+        },
       });
       this.socketService.sendNotification(mentorId, notification);
       return notification;
@@ -71,6 +74,9 @@ export class SendNotificationService {
             sessionId: sessionId,
           },
         },
+        include: {
+          type: true,
+        },
       });
       this.socketService.sendNotification(userId, notification);
       return notification;
@@ -101,6 +107,9 @@ export class SendNotificationService {
             },
             sessionId: sessionId,
           },
+        },
+        include: {
+          type: true,
         },
       });
       this.socketService.sendNotification(userId, notification);
@@ -157,6 +166,9 @@ export class SendNotificationService {
           roomId,
           sender,
         },
+      },
+      include: {
+        type: true,
       },
     });
     this.socketService.sendNotification(receiverId, notification);
