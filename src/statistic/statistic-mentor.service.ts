@@ -79,6 +79,9 @@ export class StatisticMentorService {
   getNumberOfSession(mentorId: number, startDate: Date, endDate: Date) {
     return this.prisma.programRegister.count({
       where: {
+        program: {
+          mentorId,
+        },
         isAccepted: true,
         createAt: {
           gte: startDate,
