@@ -79,9 +79,14 @@ export class MentorService {
     return 'Form submitted';
   }
 
-  async getMentors(pending: boolean) {
-    const users = await this.prisma.user.findMany({
-      where: {
+  async getMentors(pending?: boolean) {
+    let where: Prisma.UserWhereInput = {
+      AND: {
+        role: Role.MENTOR,
+      },
+    };
+    if (pending !== undefined) {
+      where = {
         AND: {
           role: Role.MENTOR,
           isActive: !pending,
@@ -89,7 +94,10 @@ export class MentorService {
             isAccepted: !pending,
           },
         },
-      },
+      };
+    }
+    const users = await this.prisma.user.findMany({
+      where,
       include: {
         User_mentor: {
           include: {
