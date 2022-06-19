@@ -258,7 +258,7 @@ export class TransactionCoinService {
     if (!card) {
       throw new NotFoundException('Gift card not found');
     }
-    await this.prisma.$transaction([
+    const [updatedGiftCode, newTransaction] = await this.prisma.$transaction([
       this.prisma.giftCode.update({
         where: {
           code,
@@ -282,6 +282,7 @@ export class TransactionCoinService {
       }),
     ]);
     await this.calculateBalance(userId);
+    return newTransaction;
   }
 
   async topUpByAdmin(userId: number, coin: number) {

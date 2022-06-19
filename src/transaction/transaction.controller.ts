@@ -59,9 +59,13 @@ export class TransactionController {
   @ApiOperation({ summary: 'Apply a gift card' })
   @ApiBearerAuth()
   async applyGiftCard(@GetUser() user: User, @Body() body: ApplyGiftCardDto) {
-    await this.transactionService.applyGiftCard(user.id, body.code);
+    const newTransaction = await this.transactionService.applyGiftCard(
+      user.id,
+      body.code,
+    );
     return {
       message: 'Gift card applied successfully',
+      transaction: newTransaction,
     };
   }
 
