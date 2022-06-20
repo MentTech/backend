@@ -183,6 +183,12 @@ model Rating {
   rating     Float           @default(0)
   comment    String?
   createAt   DateTime        @default(now())
+  featuredRow FeaturedRating?
+}
+
+model FeaturedRating {
+  ratingId Int    @id
+  rating   Rating @relation(fields: [ratingId], references: [id])
 }
 
 model UserTransaction {

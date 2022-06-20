@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, ProgramRegister, Rating, User } from '@prisma/client';
 import { GetRatingQueryDto } from '../mentor/dtos/get-rating-query.dto';
@@ -97,5 +101,58 @@ export class RatingService {
       },
     });
     return ratings.map((rating) => this.transformRating(rating));
+  }
+
+  async addToFeatured(id: number) {
+    const count = await this.prisma.featuredRating.count();
+    if (count >= 10) {
+      throw new BadRequestException('Max 10 featured rating');
+    }
+    const rating = await this.prisma.rating.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        register: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+    if (!rating) {
+      throw new NotFoundException('Rating not found');
+    }
+    await this.prisma.featuredRating.create({
+      data: {
+        ratingId: rating.id,
+      },
+    });
+    return this.transformRating(rating);
+  }
+
+  removeFromFeatured(id: number) {
+    return this.prisma.featuredRating.delete({
+      where: {
+        ratingId: id,
+      },
+    });
+  }
+
+  async getAllFeatured() {
+    const ratings = await this.prisma.featuredRating.findMany({
+      include: {
+        rating: {
+          include: {
+            register: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return ratings.map((rating) => this.transformRating(rating.rating));
   }
 }
