@@ -16,7 +16,7 @@ import { AverageResponseDto } from '../dtos/average-response.dto';
 import { RatingService } from '../rating/rating.service';
 import { UpdateMentorDto } from './dtos/update-mentor.dto';
 import { customAlphabet } from 'nanoid';
-import { MailService } from 'src/mail/mail.service';
+import { MailService } from '../mail/mail.service';
 
 export type HotMentor = {
   count: number;

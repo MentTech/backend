@@ -7,6 +7,7 @@ import { SubmitMentorDto } from './dtos/submit-mentor.dto';
 import { MentorService } from './mentor.service';
 import { SortOrder } from './dtos/search-mentor.dto';
 import { RatingService } from '../rating/rating.service';
+import { MailService } from '../mail/mail.service';
 
 const form: SubmitMentorDto = {
   email: 'test@email.com',
@@ -99,6 +100,10 @@ const mockRatingService = {
   getMultipleRating: jest.fn().mockResolvedValue([singleRating]),
 };
 
+const mockMailService = {
+  sendMentorConfirmationEmail: jest.fn().mockResolvedValue({}),
+};
+
 describe('MentorService', () => {
   let service: MentorService;
   let prisma: PrismaService;
@@ -119,6 +124,10 @@ describe('MentorService', () => {
         {
           provide: RatingService,
           useValue: mockRatingService,
+        },
+        {
+          provide: MailService,
+          useValue: mockMailService,
         },
       ],
     }).compile();

@@ -168,12 +168,12 @@ describe('RegisterService', () => {
   });
 
   it('should get all sessions (mentor)', async () => {
-    const result = await service.mentorFindAll(1, 1);
+    const result = await service.mentorFindAll(1, 1, {});
     expect(result).toEqual([singleProgram]);
   });
 
   it('should get all sessions (mentee)', async () => {
-    const result = await service.menteeFindAll(1, 1);
+    const result = await service.menteeFindAll(1, 1, {});
     expect(result).toEqual([singleProgram]);
   });
 

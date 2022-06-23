@@ -63,7 +63,7 @@ describe('NotificationService', () => {
   });
 
   it("should return user's notifications", async () => {
-    const result = await service.getNotification(1);
+    const result = await service.getNotification(1, 10, 0);
     expect(result).toEqual(notifications);
   });
 
