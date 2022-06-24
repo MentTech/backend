@@ -132,6 +132,9 @@ export class AuthService {
 
   async logInByEmail(email: string, name: string, avatar?: string) {
     let user = await this.usersService.findByEmail(email);
+    if (user.role !== Role.MENTEE) {
+      throw new ForbiddenException('Not allow to login by email');
+    }
     if (!user) {
       user = await this.signUp(
         {
