@@ -313,6 +313,14 @@ export class MentorService {
         rating: true,
       },
     });
+    await this.prisma.userMentor.update({
+      where: {
+        userId: mentorId,
+      },
+      data: {
+        rating: avg._avg.rating,
+      },
+    });
     return new AverageResponseDto({
       count,
       average: avg._avg.rating,
