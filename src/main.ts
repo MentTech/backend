@@ -43,7 +43,12 @@ const setup = (app: INestApplication) => {
 };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger:
+      process.env.NODE_ENV === 'development'
+        ? ['verbose']
+        : ['error', 'warn', 'log'],
+  });
   setup(app);
   const config = app.get(ConfigService);
   const port = config.get<string>('port');

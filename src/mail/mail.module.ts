@@ -13,13 +13,17 @@ import { ConfigService } from '@nestjs/config';
             host: config.get<string>('mail.smtpHost'),
             port: 465,
             secure: true,
+            // auth: {
+            //   type: 'OAuth2',
+            //   user: config.get<string>('mail.username'),
+            //   accessToken: config.get<string>('mail.accessToken'),
+            //   refreshToken: config.get<string>('mail.refreshToken'),
+            //   clientId: config.get<string>('google.googleClientId'),
+            //   clientSecret: config.get<string>('google.googleSecret'),
+            // },
             auth: {
-              type: 'OAuth2',
               user: config.get<string>('mail.username'),
-              accessToken: config.get<string>('mail.accessToken'),
-              refreshToken: config.get<string>('mail.refreshToken'),
-              clientId: config.get<string>('google.googleClientId'),
-              clientSecret: config.get<string>('google.googleSecret'),
+              pass: config.get<string>('mail.password'),
             },
           },
           defaults: {
