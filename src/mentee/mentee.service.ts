@@ -29,13 +29,36 @@ export class MenteeService {
     return this.prisma.programRegister.findMany({
       where: {
         userId: id,
-        ...query,
+        isCanceled: query.isCanceled,
+        isAccepted: query.isAccepted,
+        done: query.done,
+        expectedDate: {
+          gte: query.expectedStartDate,
+          lte: query.expectedEndDate,
+        },
       },
       include: {
         program: true,
         rating: true,
       },
     });
+  }
+
+  async getMySessionById(menteeId: number, sessionId: number) {
+    const session = await this.prisma.programRegister.findFirst({
+      where: {
+        userId: menteeId,
+        id: sessionId,
+      },
+      include: {
+        program: true,
+        rating: true,
+      },
+    });
+    if (!session) {
+      throw new NotFoundException('Session not found');
+    }
+    return session;
   }
 
   async getFavorites(menteeId: number) {

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -44,6 +45,18 @@ export class MenteeController {
   @ApiBearerAuth()
   getMySession(@GetUser() user: User, @Query() query: SessionQueryDto) {
     return this.menteeService.getMySession(user.id, query);
+  }
+
+  @Get('/mysession/:id')
+  @UseGuards(JwtAuthenticationGuard, RolesGuard)
+  @Roles(Role.MENTEE)
+  @ApiOperation({ summary: 'Get my session by id' })
+  @ApiBearerAuth()
+  getMySessionById(@GetUser() user: User, @Param('id') sessionId: string) {
+    if (isNaN(+sessionId)) {
+      throw new BadRequestException('Session id is not a number');
+    }
+    return this.menteeService.getMySessionById(user.id, +sessionId);
   }
 
   @Get('/favorite')

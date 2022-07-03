@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsOptional } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsBoolean, IsDate, IsOptional } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 
 export class SessionQueryDto {
   @IsBoolean()
@@ -32,4 +32,24 @@ export class SessionQueryDto {
   })
   @ApiPropertyOptional()
   done?: boolean;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date-time',
+    description: 'start expected date range (leave empty for no limit)',
+  })
+  expectedStartDate?: Date;
+
+  @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  @ApiPropertyOptional({
+    type: String,
+    format: 'date-time',
+    description: 'end expected date range (leave empty for no limit)',
+  })
+  expectedEndDate?: Date;
 }
