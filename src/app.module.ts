@@ -30,6 +30,7 @@ import { ChatSocketModule } from './chat-socket/chat-socket.module';
 import { StatisticModule } from './statistic/statistic.module';
 import { PaypalModule } from './paypal/paypal.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CryptoModule } from './crypto/crypto.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     StatisticModule,
     PaypalModule,
     ScheduleModule.forRoot(),
+    CryptoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -15,8 +15,11 @@ import { GetRatingQueryDto } from './dtos/get-rating-query.dto';
 import { AverageResponseDto } from '../dtos/average-response.dto';
 import { RatingService } from '../rating/rating.service';
 import { UpdateMentorDto } from './dtos/update-mentor.dto';
-import { customAlphabet } from 'nanoid';
+import { customAlphabet, nanoid } from 'nanoid';
 import { MailService } from '../mail/mail.service';
+import { MentorVerifyInfoDto } from './dtos/mentor-verify-info.dto';
+import { CryptoService } from 'src/crypto/crypto.service';
+import * as moment from 'moment';
 
 export type HotMentor = {
   count: number;
@@ -30,6 +33,7 @@ export class MentorService {
     private readonly authService: AuthService,
     private readonly ratingService: RatingService,
     private readonly mailService: MailService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   async submitMentor(form: SubmitMentorDto) {
@@ -37,7 +41,7 @@ export class MentorService {
     const hashedPassword = await this.authService.createHashedPassword(
       password,
     );
-    await this.prisma.user.create({
+    const mentor = await this.prisma.user.create({
       data: {
         email: form.email,
         name: form.name,
@@ -76,7 +80,21 @@ export class MentorService {
         },
       },
     });
-    return 'Form submitted';
+    const code = await this.prisma.activationCode.create({
+      data: {
+        userId: mentor.id,
+        code: nanoid(),
+      },
+    });
+    const url = await this.mailService.sendMentorVerificationEmail(
+      mentor,
+      code.code,
+    );
+    return {
+      message: 'Form submitted successfully',
+      verifyUrl: url,
+      verifyCode: code.code,
+    };
   }
 
   async getMentors(pending?: boolean) {
@@ -530,6 +548,76 @@ export class MentorService {
                     where um."userId" = ${mentorId} and pr."isAccepted" = true`;
     return {
       mentee: ret[0]?.mentee || 0,
+    };
+  }
+
+  async getToken(token: string) {
+    const code = await this.prisma.activationCode.findFirst({
+      where: {
+        code: token,
+        isUsed: false,
+        user: {
+          User_mentor: {
+            isVerified: false,
+          },
+        },
+      },
+    });
+    if (!code) {
+      throw new NotFoundException('Not found');
+    }
+    return code;
+  }
+
+  async checkVerifyToken(token: string) {
+    await this.getToken(token);
+    return {
+      message: 'Code valid',
+    };
+  }
+
+  async verifyMentor(token: string, body: MentorVerifyInfoDto) {
+    const code = await this.getToken(token);
+    if (!this.cryptoService.verifySign(body.dataBase64, body.dataSign)) {
+      throw new BadRequestException('Invalid sign');
+    }
+    const { object } = this.cryptoService.decodeBase64AndParse(body.dataBase64);
+    const name: string = object.name;
+    const birth_day: string = object.birth_day;
+    const mentor = await this.prisma.user.findFirst({
+      where: {
+        id: code.userId,
+      },
+      include: {
+        User_mentor: true,
+      },
+    });
+    const birth_day_date = moment(birth_day, 'DD/MM/YYYY').format('L');
+    const db_birth_day_date = moment(mentor.birthday).format('L');
+    if (
+      mentor.name.toLowerCase() !== name.toLowerCase() ||
+      birth_day_date !== db_birth_day_date
+    ) {
+      throw new BadRequestException('Invalid data');
+    }
+    await this.prisma.userMentor.update({
+      where: {
+        userId: code.userId,
+      },
+      data: {
+        isVerified: true,
+      },
+    });
+    await this.prisma.activationCode.update({
+      where: {
+        id: code.id,
+      },
+      data: {
+        isUsed: true,
+      },
+    });
+    return {
+      message: 'Verified',
     };
   }
 }

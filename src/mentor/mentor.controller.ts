@@ -40,6 +40,7 @@ import { MentorGuard } from '../guards/mentor.guard';
 import { SessionStatisticMentorQueryDto } from './dtos/session-statistic-mentor-query.dto';
 import { GetMultipleMentorsDto } from './dtos/get-multiple-mentors.dto';
 import { SessionMentorQueryDto } from './dtos/session-mentor-query.dto';
+import { MentorVerifyInfoDto } from './dtos/mentor-verify-info.dto';
 
 @Controller('mentor')
 @ApiTags('Mentor')
@@ -57,6 +58,21 @@ export class MentorController {
   @ApiOperation({ summary: 'submit mentor application (add avatar to body)' })
   submitForm(@Body() form: SubmitMentorDto) {
     return this.mentorService.submitMentor(form);
+  }
+
+  @Get('/verify/:token')
+  @ApiOperation({ summary: 'Check verify token' })
+  checkVerifyToken(@Param('token') token: string) {
+    return this.mentorService.checkVerifyToken(token);
+  }
+
+  @Post('/verify/:token')
+  @ApiOperation({ summary: 'Verify mentor' })
+  verifyMentor(
+    @Param('token') token: string,
+    @Body() body: MentorVerifyInfoDto,
+  ) {
+    return this.mentorService.verifyMentor(token, body);
   }
 
   @Patch('/profile')

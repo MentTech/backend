@@ -55,6 +55,7 @@ model UserMentor {
   featuredRatings Int[]
   rating          Decimal           @default(0)
   isAccepted      Boolean           @default(false)
+  isVerified      Boolean           @default(false)
   createAt        DateTime          @default(now())
 }
 

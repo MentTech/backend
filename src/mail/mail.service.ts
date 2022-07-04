@@ -36,4 +36,19 @@ export class MailService {
       },
     });
   }
+
+  async sendMentorVerificationEmail(user: User, token: string) {
+    const web = this.config.get<string>('url.web');
+    const url = `${web}/register/mentor/verify/${token}`;
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Verify your identity',
+      template: 'verify-mentor',
+      context: {
+        name: user.name,
+        url,
+      },
+    });
+    return url;
+  }
 }

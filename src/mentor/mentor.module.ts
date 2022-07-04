@@ -10,6 +10,7 @@ import { RatingModule } from '../rating/rating.module';
 import { AchievementModule } from './achievement/achievement.module';
 import { SessionStatisticService } from './session-statistic.service';
 import { MailModule } from '../mail/mail.module';
+import { CryptoModule } from '../crypto/crypto.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { MailModule } from '../mail/mail.module';
     RatingModule,
     AchievementModule,
     MailModule,
+    CryptoModule,
   ],
   controllers: [MentorController],
   providers: [MentorService, SessionStatisticService],
